@@ -1,0 +1,66 @@
+16x16 map
+SOOOO#OO#OOOOO#O%
+OO#OO##O#O#OOOOO%
+OO##OOOOOO##OOOO%
+OOOOOO#OO#OOOOOO%
+O##OO#OOOOO#OO#O%
+O#OOO#O##OOO#OOO%
+#OOOOOOOOOOOOO#O%
+OOOO#O##OO##OOOO%
+O#OOOOOOOOO#O#OO%
+OO#O#OOO##OOOO#O%
+OOO#OOOOOOOOOOOO%
+O#OO#O#OO#OOOOOO%
+OOO#OOOOOOOOO#OO%
+OOOOO#OO#OOOOOO#%
+O##OOOOOO#O#OOOO%
+OOOO#OOOOOOOOOOG
+
+m SOOOO#OO#OOOOO#O%OO#OO##O#O#OOOOO%OO##OOOOOO##OOOO%OOOOOO#OO#OOOOOO%O##OO#OOOOO#OO#O%O#OOO#O##OOO#OOO%#OOOOOOOOOOOOO#O%OOOO#O##OO##OOOO%O#OOOOOOOOO#O#OO%OO#O#OOO##OOOO#O%OOO#OOOOOOOOOOOO%O#OO#O#OO#OOOOOO%OOO#OOOOOOOOO#OO%OOOOO#OO#OOOOOO#%O##OOOOOO#O#OOOO%OOOO#OOOOOOOOOOG
+
+
+3x3 map
+SOO%
+##O%
+OGO
+
+m SOO%##O%OGO
+
+3x3 map2
+O#G%
+S#O%
+OOO
+
+m O#G%S#O%OOO
+s
+
+7x5 map
+S#OOO%
+OO#O#%
+OO###%
+#OOOO%
+###OO%
+O###O%
+GOOOO
+
+m S#OOO%OO#O#%OO###%#OOOO%###OO%O###O%GOOOO
+
+
+15x13
+#############%
+####OOOOOOOS#%
+##OOO########%
+#OO##########%
+#O###########%
+#O###########%
+#O###########%
+#O####GOOOOO#%
+#O########OOO%
+#O##########O%
+#OO#########O%
+##OO########O%
+###OOO####OOO%
+#####OOOOOOO#%
+#############
+
+m #############%####OOOOOOOS#%##OOO########%#OO##########%#O###########%#O###########%#O###########%#O####GOOOOO#%#O########OOO%#O##########O%#OO#########O%##OO########O%###OOO####OOO%#####OOOOOOO#%#############

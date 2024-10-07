@@ -490,27 +490,27 @@ void initSys(void){
 //	timer_SetState(&samplingTimer, TIMER_OFF);
 
 	// Config UART communication
-//	pinTX_h.pGPIOx								= GPIOA;
-//	pinTX_h.pinConfig.GPIO_PinNumber			= PIN_2;
-	pinTX_h.pGPIOx								= GPIOA; // USART1
-	pinTX_h.pinConfig.GPIO_PinNumber			= PIN_9; // USART1
+	pinTX_h.pGPIOx								= GPIOA;
+	pinTX_h.pinConfig.GPIO_PinNumber			= PIN_2;
+//	pinTX_h.pGPIOx								= GPIOA; // USART1
+//	pinTX_h.pinConfig.GPIO_PinNumber			= PIN_9; // USART1
 	pinTX_h.pinConfig.GPIO_PinMode				= GPIO_MODE_ALTFN;
 	pinTX_h.pinConfig.GPIO_PinOutputSpeed		= GPIO_OSPEED_HIGH;
 	pinTX_h.pinConfig.GPIO_PinAltFunMode		= AF7;
 	gpio_Config(&pinTX_h);
 
-//	pinRX_h.pGPIOx								= GPIOA;
-//	pinRX_h.pinConfig.GPIO_PinNumber			= PIN_3;
-	pinRX_h.pGPIOx								= GPIOA; // USART1
-	pinRX_h.pinConfig.GPIO_PinNumber			= PIN_10; // USART1
+	pinRX_h.pGPIOx								= GPIOA;
+	pinRX_h.pinConfig.GPIO_PinNumber			= PIN_3;
+//	pinRX_h.pGPIOx								= GPIOA; // USART1
+//	pinRX_h.pinConfig.GPIO_PinNumber			= PIN_10; // USART1
 	pinRX_h.pinConfig.GPIO_PinMode				= GPIO_MODE_ALTFN;
 	pinRX_h.pinConfig.GPIO_PinAltFunMode		= AF7;
 	gpio_Config(&pinRX_h);
 
-//	h_commSerial.ptrUSARTx						= USART2;
-//	h_commSerial.USART_Config.baudrate			= USART_BAUDRATE_115200;
-	h_commSerial.ptrUSARTx						= USART1;
-	h_commSerial.USART_Config.baudrate			= USART_BAUDRATE_19200; // For 50MHz APB1 clock USART1
+	h_commSerial.ptrUSARTx						= USART2;
+	h_commSerial.USART_Config.baudrate			= USART_BAUDRATE_115200;
+//	h_commSerial.ptrUSARTx						= USART1;
+//	h_commSerial.USART_Config.baudrate			= USART_BAUDRATE_19200; // For 50MHz APB1 clock USART1
 	h_commSerial.USART_Config.datasize			= USART_DATASIZE_8BIT;
 	h_commSerial.USART_Config.mode				= USART_MODE_RXTX;
 	h_commSerial.USART_Config.parity			= USART_PARITY_NONE;

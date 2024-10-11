@@ -143,7 +143,6 @@ extern TaskHandle_t xTaskHandler_gyroGetID;
 extern QueueHandle_t xQueueHandler_gyroData;
 
 extern TimerHandle_t xTimerHandler_LED;
-extern TimerHandle_t xTimerHandler_encoderSampling;
 
 //extern SemaphoreHandle_t xBinSemphrHandler_MoveOneStep;
 

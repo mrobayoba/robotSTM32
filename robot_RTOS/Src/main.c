@@ -26,22 +26,22 @@
 #define STACK_SIZE_COMM 100
 
 /* Handlers */
-GPIO_Handler_t GPIO_stateLED = {0};
+GPIO_Handler_t GPIO_stateLED 		= {0};
 
 // UART comm
-USART_Handler_t USART_commSerial = {0};
-GPIO_Handler_t GPIO_pinTX = {0};
-GPIO_Handler_t GPIO_pinRX = {0};
+USART_Handler_t USART_commSerial 	= {0};
+GPIO_Handler_t GPIO_pinTX 			= {0};
+GPIO_Handler_t GPIO_pinRX 			= {0};
 
 //
-GPIO_Handler_t GPIO_proximityInt = {0};
-EXTI_Config_t EXTI_proximityInt = {0};
+GPIO_Handler_t GPIO_proximityInt 	= {0};
+EXTI_Config_t EXTI_proximityInt 	= {0};
 
 // Encoders
-GPIO_Handler_t GPIO_encoderR = {0}; // PinC1
-GPIO_Handler_t GPIO_encoderL = {0}; //PinC3
+GPIO_Handler_t GPIO_encoderR 		= {0}; // PinC1
+GPIO_Handler_t GPIO_encoderL 		= {0}; //PinC3
 
-Timer_Handler_t TIM_samplingTimer = {0};
+Timer_Handler_t TIM_samplingTimer 	= {0};
 
 encoder_handler_t encoderS_Handler 	= {0}; // Private
 
@@ -50,41 +50,41 @@ PID_Controller_t PID_Left 			= {0};
 PID_Controller_t PID_Right			= {0};
 
 // PWM wheels
-GPIO_Handler_t GPIO_pwm_R	=	{0}; //
-GPIO_Handler_t GPIO_enR = {0}; //
-GPIO_Handler_t GPIO_inR = {0}; //
+GPIO_Handler_t GPIO_pwm_R			= {0}; //
+GPIO_Handler_t GPIO_enR 			= {0}; //
+GPIO_Handler_t GPIO_inR 			= {0}; //
 
-GPIO_Handler_t GPIO_pwm_L	=	{0}; //
-GPIO_Handler_t GPIO_enL = {0}; //
-GPIO_Handler_t GPIO_inL = {0}; //
+GPIO_Handler_t GPIO_pwm_L			= {0}; //
+GPIO_Handler_t GPIO_enL 			= {0}; //
+GPIO_Handler_t GPIO_inL 			= {0}; //
 
-PWM_Handler_t PWM_Right = {0}; // RIGHT WHEEL
-PWM_Handler_t PWM_Left = {0}; // LEFT WHEEL
+PWM_Handler_t PWM_Right 			= {0}; // RIGHT WHEEL
+PWM_Handler_t PWM_Left 				= {0}; // LEFT WHEEL
 
 // A-star
-mapHandler_t Map_Handler = {0};
+mapHandler_t Map_Handler 			= {0};
 
 // For drive the Oppy_1
-uint16_t N_right = 0; // Number of steps counted in DELTA_T seconds
-uint16_t N_left = 0;
-float speed_fixed_L = 0;
-float speed_fixed_R = 0;
-uint16_t pwmRight = 0;
-uint16_t pwmLeft = 0;
+uint16_t N_right 				= 0; // Number of steps counted in DELTA_T seconds
+uint16_t N_left 				= 0;
+float speed_fixed_L 			= 0;
+float speed_fixed_R 			= 0;
+uint16_t pwmRight 				= 0;
+uint16_t pwmLeft 				= 0;
 
-float omega = 0; // angular frequency
-float S_Right = 0; // distance factor: To calculate distance
-float	S_Left = 0;
+float omega 			= 0; // angular frequency
+float S_Right 			= 0; // distance factor: To calculate distance
+float	S_Left 			= 0;
 
-float speed = 30; // 30mm/s by Default
-float N_setpoint = 12; // 12 counts on 100ms
-float distance = 0;
-float target = 0; // To define a distance/angule target
+float speed 			= 30; // 30mm/s by Default
+float N_setpoint 		= 12; // 12 counts on 100ms
+float distance 			= 0;
+float target 			= 0; // To define a distance/angule target
 
-uint8_t flag_newSpeed = RESET;
-uint8_t flag_refreshPwm = RESET;
-uint8_t flag_restart_movement = RESET;
-uint8_t flag_PID = RESET;
+uint8_t flag_newSpeed 			= RESET;
+uint8_t flag_refreshPwm 		= RESET;
+uint8_t flag_restart_movement 	= RESET;
+uint8_t flag_PID 				= RESET;
 
 // for SPI
 //SPI_Handler_t spiTester	= {0};
@@ -96,17 +96,6 @@ uint8_t flag_PID = RESET;
 //
 //GPIO_Handler_t spi_extiPin_DataAvailable = {0};
 //EXTI_Config_t spi_DataAvailable = {0};
-
-//#define FLAG_PUMP_REF 2
-//uint8_t flag_REGISTER1 = 0;
-//
-//if(algo){
-//	flags |= 1<<FLAG_PUMP_REF;
-//}
-//
-//if(flags & 1<<FLAG_PUMP_REF){
-//
-//}
 
 /* Task Handlers */
 /* comm tasks*/
@@ -121,21 +110,15 @@ TaskHandle_t xTaskHandler_Astar = NULL;
 TaskHandle_t xTaskHandler_driveOppyTo = NULL;
 TaskHandle_t xTaskHandler_squareTest = NULL;
 
-/* Gyroscope */
-//TaskHandle_t xTaskHandler_gyroGetID = NULL;
-//TaskHandle_t xTaskHandler_gyroGetData = NULL;
 /* Queues Handlers */
 /* comm queues */
 QueueHandle_t xQueueHandler_print;
 QueueHandle_t xQueueHandler_inputData;
 QueueHandle_t xQueueHandler_naviList;
-
-/* operational queues */
 //QueueHandle_t xQueueHandler_gyroData;
 
 /* Software timer */
 TimerHandle_t xTimerHandler_LED;
-TimerHandle_t xTimerHandler_encoderSampling;
 
 /* Binary Semaphore */
 //SemaphoreHandle_t xBinSemphrHandler_MoveOneStep;
@@ -158,13 +141,18 @@ float correctionFactor = 0.35f;
 BaseType_t xReturned; // To check the task status
 
 uint16_t msToBlink = 250;
-//int16_t gyroBuffer[GYRO_WATERMARK_VALUE*3] = {0}; // this size is because when the FIFO is read
-// all the output data registers will be
+
+//float cFactor = 0.0f; // For gyro
+
+/*
+ * this size is because when the FIFO is read
+ * all the output data registers will be out of it
+ */
+//int16_t gyroBuffer[GYRO_WATERMARK_VALUE*3] = {0};
 
 const TickType_t xBlockTimeMaxExpected = pdMS_TO_TICKS(1000); // ait in block state max 1s
 
 TickType_t motionDelay = pdMS_TO_TICKS(250); // To wait before a step in driveOppyTo
-//float cFactor =	0; // For Gyro
 
 // For calibration
 uint16_t sampling_time = SAMPLING_TIME;
@@ -180,8 +168,6 @@ float gridSize = GRID_SIZE; // if not grid size is enter, use GRID_SIZE as defau
 void initSys(void);
 
 extern void clear_string(char *string);
-//extern void oppyStart(void);
-//extern void oppyStop(void);
 
 /* RTOS Prototypes */
 extern void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
@@ -194,9 +180,6 @@ extern void vTask_PID_core(void* pvParameters);
 extern void vTask_Astar(void* pvParameters);
 extern void vTask_driveOppyTo(void* pvParameters); // Pass movement type (for, back, right, left) and distance(angle) to drive the spirit
 extern void vTask_squareTest(void* pvParameters);
-
-//extern void vTask_gyroGetID(void* pvParameters);
-//extern void vTask_gyroGetData(void* pvParameters);
 
 extern void vTimer_Callback_LED(TimerHandle_t xTimer);
 extern void vTimer_Callback_encoderSampling(TimerHandle_t xTimer);
@@ -228,7 +211,7 @@ int main(void)
 	xReturned = xTaskCreate(
 	                    vTask_menu,       				/* Function that implements the task. */
 	                    "Menu Task",          			/* Text name for the task. */
-	                    MIN_STACK_SIZE*30,      			/* Stack size in words, not bytes. Remains 13 words */
+	                    MIN_STACK_SIZE*3,      			/* Stack size in words, not bytes. Remains 13 words */
 	                    NULL,    						/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_2,	/* Priority at which the task is created. */
 	                    &xTaskHandler_menu );      		/* Used to pass out the created task's handle. */
@@ -248,82 +231,61 @@ int main(void)
 	xReturned = xTaskCreate(
 	                    vTask_comm,       				/* Function that implements the task. */
 	                    "Command Task",          		/* Text name for the task. */
-	                    MIN_STACK_SIZE*20,      			/* Stack size in words, not bytes. Remains 13 words */
+	                    MIN_STACK_SIZE*3,      			/* Stack size in words, not bytes. Remains 13 words */
 	                    NULL,    						/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_2,	/* Priority at which the task is created. */
-	                    &xTaskHandler_comm );      		/* Used to pass out the created task's handle. */
+	                    &xTaskHandler_comm );	  		/* Used to pass out the created task's handle. */
 	configASSERT(xReturned == pdPASS);
 
 	// Task blinky mode
 	xReturned = xTaskCreate(
 	                    vTask_blinkyMode,       		/* Function that implements the task. */
 	                    "Blinky mode",          		/* Text name for the task. */
-	                    MIN_STACK_SIZE-40,      			/* Stack size in words, not bytes. Remains 8 words */
+	                    MIN_STACK_SIZE-40,      		/* Stack size in words, not bytes. Remains 8 words */
 	                    (void*) &msToBlink,    			/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_2,	/* Priority at which the task is created. */
 	                    &xTaskHandler_blinkyMode);      /* Used to pass out the created task's handle. */
 	configASSERT(xReturned == pdPASS);
 
-	// Task print encoders mode
+	// Task PID robot driver
 	xReturned = xTaskCreate(
-	                    vTask_PID_core,       		/* Function that implements the task. */
+	                    vTask_PID_core,       			/* Function that implements the task. */
 	                    "PID core task",          		/* Text name for the task. */
-	                    MIN_STACK_SIZE*2,      			/* Stack size in words, not bytes. Remains 12 words */
-	                    (void*) &encoderS_Handler,    			/* Parameter passed into the task. */
+	                    MIN_STACK_SIZE*3,      			/* Stack size in words, not bytes. Remains 12 words */
+	                    (void*) &encoderS_Handler,    	/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_5,	/* Priority at which the task is created. */
-	                    &xTaskHandler_PID_core);      /* Used to pass out the created task's handle. */
+	                    &xTaskHandler_PID_core);      	/* Used to pass out the created task's handle. */
 	configASSERT(xReturned == pdPASS);
 
 	// Task A-star
 	xReturned = xTaskCreate(
-	                    vTask_Astar,       		/* Function that implements the task. */
-	                    "A-star algorithm",          		/* Text name for the task. */
-	                    MIN_STACK_SIZE*30,      			/* Stack size in words, not bytes. Remains 12 words */
-	                    NULL,    			/* Parameter passed into the task. */
+	                    vTask_Astar,       				/* Function that implements the task. */
+	                    "A-star algorithm",          	/* Text name for the task. */
+	                    MIN_STACK_SIZE*10,      		/* Stack size in words, not bytes. Remains 12 words */
+	                    NULL,    						/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_4,	/* Priority at which the task is created. */
-	                    &xTaskHandler_Astar);      /* Used to pass out the created task's handle. */
+	                    &xTaskHandler_Astar);      		/* Used to pass out the created task's handle. */
 	configASSERT(xReturned == pdPASS);
 
 	// Task driveOppyTo
 	xReturned = xTaskCreate(
 	                    vTask_driveOppyTo,       		/* Function that implements the task. */
-	                    "Oppy driver task",          		/* Text name for the task. */
-	                    MIN_STACK_SIZE*30,      			/* Stack size in words, not bytes. Remains 12 words */
-	                    NULL,    			/* Parameter passed into the task. */
+	                    "Oppy driver task",          	/* Text name for the task. */
+	                    MIN_STACK_SIZE*2,      		/* Stack size in words, not bytes. Remains 12 words */
+	                    NULL,    						/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_3,	/* Priority at which the task is created. */
-	                    &xTaskHandler_driveOppyTo);      /* Used to pass out the created task's handle. */
+	                    &xTaskHandler_driveOppyTo);     /* Used to pass out the created task's handle. */
 	configASSERT(xReturned == pdPASS);
 
 	// Task square test
 	xReturned = xTaskCreate(
 	                    vTask_squareTest,       		/* Function that implements the task. */
 	                    "square test",          		/* Text name for the task. */
-	                    MIN_STACK_SIZE*30,      			/* Stack size in words, not bytes. Remains 12 words */
-	                    NULL,    			/* Parameter passed into the task. */
+	                    MIN_STACK_SIZE,      		/* Stack size in words, not bytes. Remains 12 words */
+	                    NULL,    						/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_4,	/* Priority at which the task is created. */
 	                    &xTaskHandler_squareTest);      /* Used to pass out the created task's handle. */
 	configASSERT(xReturned == pdPASS);
-
-
-	// Task gyro get ID SPI
-//	xReturned = xTaskCreate(
-//						vTask_gyroGetID,        		/* Function that implements the task. */
-//	                    "Gyro get ID",          		/* Text name for the task. */
-//	                    STACK_SIZE,      				/* Stack size in words, not bytes. */
-//	                    NULL,    						/* Parameter passed into the task. */
-//	                    e_PRIORITY_FREERTOS_MIN_PLUS_4,	/* Priority at which the task is created. */
-//	                    &xTaskHandler_gyroGetID);      	/* Used to pass out the created task's handle. */
-//	configASSERT(xReturned == pdPASS);
-
-	// Task gyro get data SPI
-//	xReturned = xTaskCreate(
-//						vTask_gyroGetData,        		/* Function that implements the task. */
-//	                    "Gyro get data",          		/* Text name for the task. */
-//	                    STACK_SIZE*5,      				/* Stack size in words, not bytes. */
-//	                    gyroBuffer,    						/* Parameter passed into the task. */
-//	                    e_PRIORITY_FREERTOS_MIN_PLUS_4,	/* Priority at which the task is created. */
-//	                    &xTaskHandler_gyroGetData);      	/* Used to pass out the created task's handle. */
-//	configASSERT(xReturned == pdPASS);
 
 	/* Create Queues */
 	// Queue input data
@@ -335,20 +297,12 @@ int main(void)
 
 	xQueueHandler_naviList = xQueueCreate(MAX_MESH_SIZE, sizeof(nodeHandler_t*));
 	configASSERT(xQueueHandler_print != NULL);
-	// Queue gyro data
-//	xQueueHandler_gyroData = xQueueCreate(30,sizeof(uint8_t));
-//	configASSERT(xQueueHandler_gyroData != NULL);
+
 	/* Create software timer */
 	xTimerHandler_LED = xTimerCreate("led_timer", pdMS_TO_TICKS(msToBlink), pdTRUE, (void*)(1), (void *) vTimer_Callback_LED);
 	xTimerStart(xTimerHandler_LED,portMAX_DELAY);
 
-//	xTimerHandler_encoderSampling = xTimerCreate("encoder_sampling_timer", pdMS_TO_TICKS(80), pdTRUE, (void*)(1), (void *) vTimer_Callback_encoderSampling);
-//	xTimerStart(xTimerHandler_encoderSampling,portMAX_DELAY);
-
 	/* Create semaphores */
-
-//	xBinSemphrHandler_MoveOneStep = xSemaphoreCreateBinary();
-//	configASSERT(xBinSemphrHandler_MoveOneStep != NULL);
 
 	/* Create mutexes */
 
@@ -431,19 +385,15 @@ void vTimer_Callback_LED(TimerHandle_t xTimer){
 	// This code allows to check remaining stack while a task is execute
 //	clear_string(bufferData);
 //	portENTER_CRITICAL();
-//	UBaseType_t highWaterMark = uxTaskGetStackHighWaterMark(xTaskHandler_menu);
+//	UBaseType_t highWaterMark = uxTaskGetStackHighWaterMark(xTaskHandler_squareTest);
 //	sprintf(bufferData,"Remaining STACK from : %d\n\r",(uint)highWaterMark);
 //	usart_writeMsg(&USART_commSerial, (char *) bufferData);
 //	portEXIT_CRITICAL();
 //	clear_string(bufferData);
 }
 
-void vTimer_Callback_encoderSampling(TimerHandle_t xTimer){
-
-}
-
 // EXTI CallBacks
-void callback_ExtInt7(void){ // Example callback
+void callback_ExtInt7(void){ // Proximity Sensor Callback
 //	BaseType_t xHigherPriorityTaskWoken;
 //
 //	xHigherPriorityTaskWoken = pdFALSE; // Comment this!!!
@@ -468,11 +418,11 @@ void initSys(void){
 
 	// Config State LED
 	GPIO_stateLED.pGPIOx							= GPIOA;
-	GPIO_stateLED.pinConfig.GPIO_PinNumber		= PIN_5;
+	GPIO_stateLED.pinConfig.GPIO_PinNumber			= PIN_5;
 	GPIO_stateLED.pinConfig.GPIO_PinMode			= GPIO_MODE_OUT;
-	GPIO_stateLED.pinConfig.GPIO_PinOutputSpeed	= GPIO_OSPEEDR_MEDIUM;
-	GPIO_stateLED.pinConfig.GPIO_PinOutputType	= GPIO_OTYPER_PUSHPULL;
-	GPIO_stateLED.pinConfig.GPIO_PinPuPdControl	= GPIO_PUPDR_NOTHING;
+	GPIO_stateLED.pinConfig.GPIO_PinOutputSpeed		= GPIO_OSPEEDR_MEDIUM;
+	GPIO_stateLED.pinConfig.GPIO_PinOutputType		= GPIO_OTYPER_PUSHPULL;
+	GPIO_stateLED.pinConfig.GPIO_PinPuPdControl		= GPIO_PUPDR_NOTHING;
 	gpio_Config(&GPIO_stateLED);
 	gpio_WritePin(&GPIO_stateLED, RESET);
 
@@ -598,45 +548,45 @@ void initSys(void){
 
 	PWM_Right.ptrTIMx				=	TIM2;
 	PWM_Right.config.channel		=	PWM_CHANNEL_2;
-	PWM_Right.config.periodo		=	1000; 	// [ms/100] {25,50,100} Hz Default = 25Hz (1kHz)
-	PWM_Right.config.prescaler		=	100; 	// 1us
-	PWM_Right.config.dutyCycle		=	400;	// [duty/1000] Default 20.0%
-	PWM_Right.config.outPolarity	=	PWM_POLARITY_LOW; // LOW forward // HIGH backward
+	PWM_Right.config.periodo		=	1000; 				// [ms/100] {25,50,100} Hz Default = 25Hz (1kHz)
+	PWM_Right.config.prescaler		=	100; 				// 1us
+	PWM_Right.config.dutyCycle		=	400;				// [duty/1000] Default 20.0%
+	PWM_Right.config.outPolarity	=	PWM_POLARITY_LOW; 	// LOW forward // HIGH backward
 
 	pwm_Config(&PWM_Right);
 	pwm_star_Signal(&PWM_Right);
 
 	PWM_Left.ptrTIMx				=	TIM5;
-	PWM_Left.config.channel		=	PWM_CHANNEL_1;
-	PWM_Left.config.periodo		=	1000;	// 500Hz
-	PWM_Left.config.prescaler		=	100; 	// 10us
-	PWM_Left.config.dutyCycle		=	400;	// 20.0%
-	PWM_Left.config.outPolarity	=	PWM_POLARITY_HIGH; // HIGH forward // LOW backward
+	PWM_Left.config.channel			=	PWM_CHANNEL_1;
+	PWM_Left.config.periodo			=	1000;				// 500Hz
+	PWM_Left.config.prescaler		=	100; 				// 10us
+	PWM_Left.config.dutyCycle		=	400;				// 20.0%
+	PWM_Left.config.outPolarity		=	PWM_POLARITY_HIGH; 	// HIGH forward // LOW backward
 
 	pwm_Config(&PWM_Left);
 	pwm_star_Signal(&PWM_Left);
 
 	/* PID Controller */
-	PID_Left.Kp							= 40.0f; //1.9 starts in the conversion factor from N to speed
-	PID_Left.Ki							= 39.0f; //39
-	PID_Left.Kd							= 0.2f; //0.2
+	PID_Left.Kp							= 40.0f; 			//1.9 starts in the conversion factor from N to speed
+	PID_Left.Ki							= 39.0f; 			//39
+	PID_Left.Kd							= 0.2f; 			//0.2
 	//	PID_Left.delta_Kp					= 5.0f;
 
-	PID_Left.T							= SAMPLING_TIME/1000; // Sampling Time =  10ms
-	PID_Left.tau						= 3.6f; //just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
-	PID_Left.limMin						= MIN_PWM;	// N min value
-	PID_Left.limMax						= MAX_PWM;	// N max value
+	PID_Left.T							= SAMPLING_TIME/1000; 	// Sampling Time =  10ms
+	PID_Left.tau						= 3.6f; 				//just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
+	PID_Left.limMin						= MIN_PWM;				// N min value
+	PID_Left.limMax						= MAX_PWM;				// N max value
 
 
-	PID_Right.Kp						= 40.0f; //2.25 starts in the conversion factor from N to speed
-	PID_Right.Ki						= 40.0f; //45
-	PID_Right.Kd						= 0.2f; //0.2
-	//	PID_Right.delta_Kp					= 5.0f; //
+	PID_Right.Kp						= 40.0f; 			//2.25 starts in the conversion factor from N to speed
+	PID_Right.Ki						= 40.0f; 			//45
+	PID_Right.Kd						= 0.2f; 			//0.2
+	//	PID_Right.delta_Kp					= 5.0f;
 
-	PID_Right.T							= SAMPLING_TIME/1000; // Sampling Time =  10ms
-	PID_Right.tau						= TAU; //just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
-	PID_Right.limMin					= MIN_PWM+50;	// N min value
-	PID_Right.limMax					= MAX_PWM+50;	// N max value
+	PID_Right.T							= SAMPLING_TIME/1000; 	// Sampling Time =  10ms
+	PID_Right.tau						= TAU; 					//just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
+	PID_Right.limMin					= MIN_PWM+50;			// N min value
+	PID_Right.limMax					= MAX_PWM+50;			// N max value
 
 	/*
 	 * configure SPI2
@@ -701,12 +651,12 @@ void initSys(void){
 
 	/* Private configurations */
 
-//	L3G4200D.FullScaleSelection					= e_2000DPS; // more range less sensibility
-//	L3G4200D.HPFcutOffFreq						= e_HPF_3;  // freq greater than 4Hz
-//	L3G4200D.OutputSelection					= SET;	// allows HPF and LPF2
-//	L3G4200D.allowDataReady						= RESET; // data ready int
+//	L3G4200D.FullScaleSelection					= e_2000DPS; 		// more range less sensibility
+//	L3G4200D.HPFcutOffFreq						= e_HPF_3;  		// freq greater than 4Hz
+//	L3G4200D.OutputSelection					= SET;				// allows HPF and LPF2
+//	L3G4200D.allowDataReady						= RESET; 			// data ready int
 //	L3G4200D.axisToEnable						= e_EN_ONLY_Z_AXIS;
-//	L3G4200D.bandwidth							= e_BW3; //cut off 110Hz
+//	L3G4200D.bandwidth							= e_BW3; 			//cut off 110Hz
 //	L3G4200D.outputDataRate						= e_ODR400;
 //	L3G4200D.powerMode							= e_NORMALMODE;
 //	L3G4200D.FIFOstreamEnable					= SET;

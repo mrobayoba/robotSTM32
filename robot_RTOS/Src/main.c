@@ -26,43 +26,43 @@
 #define STACK_SIZE_COMM 100
 
 /* Handlers */
-GPIO_Handler_t stateLED = {0};
+GPIO_Handler_t GPIO_stateLED = {0};
 
 // UART comm
-USART_Handler_t h_commSerial = {0};
-GPIO_Handler_t pinTX_h = {0};
-GPIO_Handler_t pinRX_h = {0};
+USART_Handler_t USART_commSerial = {0};
+GPIO_Handler_t GPIO_pinTX = {0};
+GPIO_Handler_t GPIO_pinRX = {0};
 
-// EXTI example COMMENT THIS HANDLERS!!!
-GPIO_Handler_t userButton = {0};
-EXTI_Config_t extiButton = {0};
+//
+GPIO_Handler_t GPIO_proximityInt = {0};
+EXTI_Config_t EXTI_proximityInt = {0};
 
 // Encoders
-GPIO_Handler_t encoderR = {0}; // PinC1
-GPIO_Handler_t encoderL = {0}; //PinC3
+GPIO_Handler_t GPIO_encoderR = {0}; // PinC1
+GPIO_Handler_t GPIO_encoderL = {0}; //PinC3
 
-Timer_Handler_t samplingTimer = {0};
+Timer_Handler_t TIM_samplingTimer = {0};
 
-encoder_handler_t encoderS 	= {0}; // Private
+encoder_handler_t encoderS_Handler 	= {0}; // Private
 
 // PID
-PID_Controller_t pid_Left 			= {0};
-PID_Controller_t pid_Right			= {0};
+PID_Controller_t PID_Left 			= {0};
+PID_Controller_t PID_Right			= {0};
 
 // PWM wheels
-GPIO_Handler_t gpio_pwm_R	=	{0}; //
-GPIO_Handler_t enR = {0}; //PinA5
-GPIO_Handler_t inR = {0}; //PinA5
+GPIO_Handler_t GPIO_pwm_R	=	{0}; //
+GPIO_Handler_t GPIO_enR = {0}; //
+GPIO_Handler_t GPIO_inR = {0}; //
 
-GPIO_Handler_t gpio_pwm_L	=	{0}; //
-GPIO_Handler_t enL = {0}; //PinA5
-GPIO_Handler_t inL = {0}; //PinA5
+GPIO_Handler_t GPIO_pwm_L	=	{0}; //
+GPIO_Handler_t GPIO_enL = {0}; //
+GPIO_Handler_t GPIO_inL = {0}; //
 
-PWM_Handler_t pwm_R = {0}; // RIGHT WHEEL
-PWM_Handler_t pwm_L = {0}; // LEFT WHEEL
+PWM_Handler_t PWM_Right = {0}; // RIGHT WHEEL
+PWM_Handler_t PWM_Left = {0}; // LEFT WHEEL
 
 // A-star
-mapHandler_t Map = {0};
+mapHandler_t Map_Handler = {0};
 
 // For drive the Oppy_1
 uint16_t N_right = 0; // Number of steps counted in DELTA_T seconds
@@ -269,7 +269,7 @@ int main(void)
 	                    vTask_PID_core,       		/* Function that implements the task. */
 	                    "PID core task",          		/* Text name for the task. */
 	                    MIN_STACK_SIZE*2,      			/* Stack size in words, not bytes. Remains 12 words */
-	                    (void*) &encoderS,    			/* Parameter passed into the task. */
+	                    (void*) &encoderS_Handler,    			/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_5,	/* Priority at which the task is created. */
 	                    &xTaskHandler_PID_core);      /* Used to pass out the created task's handle. */
 	configASSERT(xReturned == pdPASS);
@@ -426,14 +426,14 @@ void usart1_RxCallback(void){
 
 // Software timer Callbacks
 void vTimer_Callback_LED(TimerHandle_t xTimer){
-	gpio_TogglePin(&stateLED);
+	gpio_TogglePin(&GPIO_stateLED);
 
 	// This code allows to check remaining stack while a task is execute
 //	clear_string(bufferData);
 //	portENTER_CRITICAL();
 //	UBaseType_t highWaterMark = uxTaskGetStackHighWaterMark(xTaskHandler_menu);
 //	sprintf(bufferData,"Remaining STACK from : %d\n\r",(uint)highWaterMark);
-//	usart_writeMsg(&h_commSerial, (char *) bufferData);
+//	usart_writeMsg(&USART_commSerial, (char *) bufferData);
 //	portEXIT_CRITICAL();
 //	clear_string(bufferData);
 }
@@ -443,22 +443,20 @@ void vTimer_Callback_encoderSampling(TimerHandle_t xTimer){
 }
 
 // EXTI CallBacks
-//void callback_ExtInt7(void){ // Example callback
+void callback_ExtInt7(void){ // Example callback
 //	BaseType_t xHigherPriorityTaskWoken;
 //
 //	xHigherPriorityTaskWoken = pdFALSE; // Comment this!!!
 //
-//	traceISR_ENTER(); // To detect the interrupt with SEGGER
-//	xTaskNotifyFromISR(xxTaskHandler_blinkyMode,0,eNoAction,&xHigherPriorityTaskWoken);
-//	traceISR_EXIT();
-//}
+//	xTaskNotifyFromISR(xTaskHandler_blinkyMode,0,eNoAction,&xHigherPriorityTaskWoken);
+}
 
 // STACK OVERFLOW CALLBACK
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
     // Handle stack overflow, e.g., log the error, reset the system, etc.
 	clear_string(bufferData);
 	sprintf(bufferData,"Stack Overflow detected in task: %s\n\r",pcTaskName);
-	usart_writeMsg(&h_commSerial, (char *) bufferData);
+	usart_writeMsg(&USART_commSerial, (char *) bufferData);
 	clear_string(bufferData);
     taskDISABLE_INTERRUPTS();
     for (;;); // Infinite loop to halt the system
@@ -469,183 +467,176 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
 void initSys(void){
 
 	// Config State LED
-	stateLED.pGPIOx							= GPIOA;
-	stateLED.pinConfig.GPIO_PinNumber		= PIN_5;
-	stateLED.pinConfig.GPIO_PinMode			= GPIO_MODE_OUT;
-	stateLED.pinConfig.GPIO_PinOutputSpeed	= GPIO_OSPEEDR_MEDIUM;
-	stateLED.pinConfig.GPIO_PinOutputType	= GPIO_OTYPER_PUSHPULL;
-	stateLED.pinConfig.GPIO_PinPuPdControl	= GPIO_PUPDR_NOTHING;
-	gpio_Config(&stateLED);
-	gpio_WritePin(&stateLED, RESET);
+	GPIO_stateLED.pGPIOx							= GPIOA;
+	GPIO_stateLED.pinConfig.GPIO_PinNumber		= PIN_5;
+	GPIO_stateLED.pinConfig.GPIO_PinMode			= GPIO_MODE_OUT;
+	GPIO_stateLED.pinConfig.GPIO_PinOutputSpeed	= GPIO_OSPEEDR_MEDIUM;
+	GPIO_stateLED.pinConfig.GPIO_PinOutputType	= GPIO_OTYPER_PUSHPULL;
+	GPIO_stateLED.pinConfig.GPIO_PinPuPdControl	= GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_stateLED);
+	gpio_WritePin(&GPIO_stateLED, RESET);
 
 	// Sampling Timer  configured in encoderCounting_driver.c
-//	samplingTimer.pTIMx								= TIM3; // 16-bit Timer
-//	samplingTimer.TIMx_Config.TIMx_Prescaler		= 10000; // Generates 0.1 ms increments
-//	samplingTimer.TIMx_Config.TIMx_Period			= 2500;	// With the prescaler, generates 250ms increments
-//	samplingTimer.TIMx_Config.TIMx_mode				= TIMER_UP_COUNTER;
-//	samplingTimer.TIMx_Config.TIMx_InterruptEnable	= TIMER_INT_ENABLE;
-//
-//	/* load the config of the Timer*/
-//	timer_Config(&samplingTimer);
-//	timer_SetState(&samplingTimer, TIMER_OFF);
+
 
 	// Config UART communication
-	pinTX_h.pGPIOx								= GPIOA;
-	pinTX_h.pinConfig.GPIO_PinNumber			= PIN_2;
-//	pinTX_h.pGPIOx								= GPIOA; // USART1
-//	pinTX_h.pinConfig.GPIO_PinNumber			= PIN_9; // USART1
-	pinTX_h.pinConfig.GPIO_PinMode				= GPIO_MODE_ALTFN;
-	pinTX_h.pinConfig.GPIO_PinOutputSpeed		= GPIO_OSPEED_HIGH;
-	pinTX_h.pinConfig.GPIO_PinAltFunMode		= AF7;
-	gpio_Config(&pinTX_h);
+	GPIO_pinTX.pGPIOx							= GPIOA;
+	GPIO_pinTX.pinConfig.GPIO_PinNumber			= PIN_2;
+//	GPIO_pinTX.pGPIOx							= GPIOA; // USART1
+//	GPIO_pinTX.pinConfig.GPIO_PinNumber			= PIN_9; // USART1
+	GPIO_pinTX.pinConfig.GPIO_PinMode			= GPIO_MODE_ALTFN;
+	GPIO_pinTX.pinConfig.GPIO_PinOutputSpeed	= GPIO_OSPEED_HIGH;
+	GPIO_pinTX.pinConfig.GPIO_PinAltFunMode		= AF7;
+	gpio_Config(&GPIO_pinTX);
 
-	pinRX_h.pGPIOx								= GPIOA;
-	pinRX_h.pinConfig.GPIO_PinNumber			= PIN_3;
-//	pinRX_h.pGPIOx								= GPIOA; // USART1
-//	pinRX_h.pinConfig.GPIO_PinNumber			= PIN_10; // USART1
-	pinRX_h.pinConfig.GPIO_PinMode				= GPIO_MODE_ALTFN;
-	pinRX_h.pinConfig.GPIO_PinAltFunMode		= AF7;
-	gpio_Config(&pinRX_h);
+	GPIO_pinRX.pGPIOx							= GPIOA;
+	GPIO_pinRX.pinConfig.GPIO_PinNumber			= PIN_3;
+//	GPIO_pinRX.pGPIOx							= GPIOA; // USART1
+//	GPIO_pinRX.pinConfig.GPIO_PinNumber			= PIN_10; // USART1
+	GPIO_pinRX.pinConfig.GPIO_PinMode			= GPIO_MODE_ALTFN;
+	GPIO_pinRX.pinConfig.GPIO_PinAltFunMode		= AF7;
+	gpio_Config(&GPIO_pinRX);
 
-	h_commSerial.ptrUSARTx						= USART2;
-	h_commSerial.USART_Config.baudrate			= USART_BAUDRATE_115200;
-//	h_commSerial.ptrUSARTx						= USART1;
-//	h_commSerial.USART_Config.baudrate			= USART_BAUDRATE_19200; // For 50MHz APB1 clock USART1
-	h_commSerial.USART_Config.datasize			= USART_DATASIZE_8BIT;
-	h_commSerial.USART_Config.mode				= USART_MODE_RXTX;
-	h_commSerial.USART_Config.parity			= USART_PARITY_NONE;
-	h_commSerial.USART_Config.stopbits			= USART_STOPBIT_1;
-	h_commSerial.USART_Config.enableIntRX		= USART_RX_INTERRUP_ENABLE;
-	h_commSerial.USART_Config.interruptPriority = e_PRIORITY_FREERTOS_MIN_PLUS_6;
-	usart_Config(&h_commSerial);
-	usart_config_newInterrupt(&h_commSerial, e_PRIORITY_FREERTOS_MIN_PLUS_6);
+	USART_commSerial.ptrUSARTx							= USART2;
+	USART_commSerial.USART_Config.baudrate				= USART_BAUDRATE_115200;
+//	USART_commSerial.ptrUSARTx							= USART1;
+//	USART_commSerial.USART_Config.baudrate				= USART_BAUDRATE_19200; // For 50MHz APB1 clock USART1
+	USART_commSerial.USART_Config.datasize				= USART_DATASIZE_8BIT;
+	USART_commSerial.USART_Config.mode					= USART_MODE_RXTX;
+	USART_commSerial.USART_Config.parity				= USART_PARITY_NONE;
+	USART_commSerial.USART_Config.stopbits				= USART_STOPBIT_1;
+	USART_commSerial.USART_Config.enableIntRX			= USART_RX_INTERRUP_ENABLE;
+	USART_commSerial.USART_Config.interruptPriority 	= e_PRIORITY_FREERTOS_MIN_PLUS_6;
+	usart_Config(&USART_commSerial);
+	usart_config_newInterrupt(&USART_commSerial, e_PRIORITY_FREERTOS_MIN_PLUS_6);
 
 	// Config EXTIs
-//	userButton.pGPIOx							= GPIOB;
-//	userButton.pinConfig.GPIO_PinNumber			= PIN_7;
-//	userButton.pinConfig.GPIO_PinMode			= GPIO_MODE_IN;
-//	userButton.pinConfig.GPIO_PinPuPdControl	= GPIO_PUPDR_NOTHING;
-//	gpio_Config(&userButton);
-//
-//	extiButton.edgeType							= EXTI_FALLING_EDGE;
-//	extiButton.interruptPriority				= e_PRIORITY_NORMAL_MIN_PLUS_10;
-//	extiButton.pGPIOHandler						= &userButton;
-//	exti_Config(&extiButton);
-//	exti_config_newInterrupt(&extiButton, e_PRIORITY_NORMAL_MIN_PLUS_4);
+	GPIO_proximityInt.pGPIOx							= GPIOC;
+	GPIO_proximityInt.pinConfig.GPIO_PinNumber			= PIN_7;
+	GPIO_proximityInt.pinConfig.GPIO_PinMode			= GPIO_MODE_IN;
+	GPIO_proximityInt.pinConfig.GPIO_PinPuPdControl		= GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_proximityInt);
+
+	EXTI_proximityInt.edgeType							= EXTI_FALLING_EDGE;
+	EXTI_proximityInt.interruptPriority					= e_PRIORITY_NORMAL_MIN_PLUS_10;
+	EXTI_proximityInt.pGPIOHandler						= &GPIO_proximityInt;
+	exti_Config(&EXTI_proximityInt);
+
+//	exti_config_newInterrupt(&EXTI_proximityInt, e_PRIORITY_NORMAL_MIN_PLUS_4); DON'T USE IT
 
 	// Encoders
 
-	encoderR.pGPIOx								=	GPIOC;
-	encoderR.pinConfig.GPIO_PinNumber			=	PIN_1;
-	encoderR.pinConfig.GPIO_PinMode				=	GPIO_MODE_IN;
-	encoderR.pinConfig.GPIO_PinPuPdControl		=	GPIO_PUPDR_NOTHING;
-	gpio_Config(&encoderR);
+	GPIO_encoderR.pGPIOx								=	GPIOC;
+	GPIO_encoderR.pinConfig.GPIO_PinNumber				=	PIN_1;
+	GPIO_encoderR.pinConfig.GPIO_PinMode				=	GPIO_MODE_IN;
+	GPIO_encoderR.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_encoderR);
 
-	encoderL.pGPIOx								=	GPIOC;
-	encoderL.pinConfig.GPIO_PinNumber			=	PIN_3;
-	encoderL.pinConfig.GPIO_PinMode				=	GPIO_MODE_IN;
-	encoderL.pinConfig.GPIO_PinPuPdControl		=	GPIO_PUPDR_NOTHING;
-	gpio_Config(&encoderL);
+	GPIO_encoderL.pGPIOx								=	GPIOC;
+	GPIO_encoderL.pinConfig.GPIO_PinNumber				=	PIN_3;
+	GPIO_encoderL.pinConfig.GPIO_PinMode				=	GPIO_MODE_IN;
+	GPIO_encoderL.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_encoderL);
 
 	/* encoder counter */
-	encoderS.encoderLeft				=	&encoderL;
-	encoderS.encoderRight				=	&encoderR;
-	encoderS.samplingTimer				=	&samplingTimer;
-	encoderS.samplingTime				=	SAMPLING_TIME; // ms
-	counterConfig(&encoderS);
+	encoderS_Handler.encoderLeft				=	&GPIO_encoderL;
+	encoderS_Handler.encoderRight				=	&GPIO_encoderR;
+	encoderS_Handler.samplingTimer				=	&TIM_samplingTimer;
+	encoderS_Handler.samplingTime				=	SAMPLING_TIME; // ms
+	counterConfig(&encoderS_Handler);
 
 	// PWM Wheels
-	gpio_pwm_R.pGPIOx 							=	GPIOA;
-	gpio_pwm_R.pinConfig.GPIO_PinNumber			=	PIN_1;
-	gpio_pwm_R.pinConfig.GPIO_PinMode			=	GPIO_MODE_ALTFN;
-	gpio_pwm_R.pinConfig.GPIO_PinAltFunMode		=	AF1;
-	gpio_pwm_R.pinConfig.GPIO_PinPuPdControl	=	GPIO_PUPDR_NOTHING;
-	gpio_Config(&gpio_pwm_R);
+	GPIO_pwm_R.pGPIOx 							=	GPIOA;
+	GPIO_pwm_R.pinConfig.GPIO_PinNumber			=	PIN_1;
+	GPIO_pwm_R.pinConfig.GPIO_PinMode			=	GPIO_MODE_ALTFN;
+	GPIO_pwm_R.pinConfig.GPIO_PinAltFunMode		=	AF1;
+	GPIO_pwm_R.pinConfig.GPIO_PinPuPdControl	=	GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_pwm_R);
 
-	gpio_pwm_L.pGPIOx 							=	GPIOA;
-	gpio_pwm_L.pinConfig.GPIO_PinNumber			=	PIN_0;
-	gpio_pwm_L.pinConfig.GPIO_PinMode			=	GPIO_MODE_ALTFN;
-	gpio_pwm_L.pinConfig.GPIO_PinAltFunMode		=	AF2;
-	gpio_pwm_L.pinConfig.GPIO_PinPuPdControl	=	GPIO_PUPDR_NOTHING;
-	gpio_Config(&gpio_pwm_L);
+	GPIO_pwm_L.pGPIOx 							=	GPIOA;
+	GPIO_pwm_L.pinConfig.GPIO_PinNumber			=	PIN_0;
+	GPIO_pwm_L.pinConfig.GPIO_PinMode			=	GPIO_MODE_ALTFN;
+	GPIO_pwm_L.pinConfig.GPIO_PinAltFunMode		=	AF2;
+	GPIO_pwm_L.pinConfig.GPIO_PinPuPdControl	=	GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_pwm_L);
 
-	enR.pGPIOx									=	GPIOC;
-	enR.pinConfig.GPIO_PinNumber				=	PIN_11;
-	enR.pinConfig.GPIO_PinMode					=	GPIO_MODE_OUT;
-	enR.pinConfig.GPIO_PinOutputType			=	GPIO_OTYPER_PUSHPULL;
-	enR.pinConfig.GPIO_PinOutputSpeed			=	GPIO_OSPEEDR_MEDIUM;
-	enR.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
-	gpio_Config(&enR);
-	gpio_WritePin(&enR, RESET); // ON = RESET, motor derecho
+	GPIO_enR.pGPIOx									=	GPIOC;
+	GPIO_enR.pinConfig.GPIO_PinNumber				=	PIN_11;
+	GPIO_enR.pinConfig.GPIO_PinMode					=	GPIO_MODE_OUT;
+	GPIO_enR.pinConfig.GPIO_PinOutputType			=	GPIO_OTYPER_PUSHPULL;
+	GPIO_enR.pinConfig.GPIO_PinOutputSpeed			=	GPIO_OSPEEDR_MEDIUM;
+	GPIO_enR.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_enR);
+	gpio_WritePin(&GPIO_enR, RESET); // ON = RESET, motor derecho
 
-	inR.pGPIOx									=	GPIOD;
-	inR.pinConfig.GPIO_PinNumber				=	PIN_2;
-	inR.pinConfig.GPIO_PinMode					=	GPIO_MODE_OUT;
-	inR.pinConfig.GPIO_PinOutputType			=	GPIO_OTYPER_PUSHPULL;
-	inR.pinConfig.GPIO_PinOutputSpeed			=	GPIO_OSPEEDR_MEDIUM;
-	inR.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
-	gpio_Config(&inR);
-	gpio_WritePin(&inR, SET); // SET forward// RESET backward
+	GPIO_inR.pGPIOx									=	GPIOD;
+	GPIO_inR.pinConfig.GPIO_PinNumber				=	PIN_2;
+	GPIO_inR.pinConfig.GPIO_PinMode					=	GPIO_MODE_OUT;
+	GPIO_inR.pinConfig.GPIO_PinOutputType			=	GPIO_OTYPER_PUSHPULL;
+	GPIO_inR.pinConfig.GPIO_PinOutputSpeed			=	GPIO_OSPEEDR_MEDIUM;
+	GPIO_inR.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_inR);
+	gpio_WritePin(&GPIO_inR, SET); // SET forward// RESET backward
 
-	enL.pGPIOx									=	GPIOC;
-	enL.pinConfig.GPIO_PinNumber				=	PIN_10;
-	enL.pinConfig.GPIO_PinMode					=	GPIO_MODE_OUT;
-	enL.pinConfig.GPIO_PinOutputType			=	GPIO_OTYPER_PUSHPULL;
-	enL.pinConfig.GPIO_PinOutputSpeed			=	GPIO_OSPEEDR_MEDIUM;
-	enL.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
-	gpio_Config(&enL);
-	gpio_WritePin(&enL, RESET); // ON = RESET, motor izquierdo
+	GPIO_enL.pGPIOx									=	GPIOC;
+	GPIO_enL.pinConfig.GPIO_PinNumber				=	PIN_10;
+	GPIO_enL.pinConfig.GPIO_PinMode					=	GPIO_MODE_OUT;
+	GPIO_enL.pinConfig.GPIO_PinOutputType			=	GPIO_OTYPER_PUSHPULL;
+	GPIO_enL.pinConfig.GPIO_PinOutputSpeed			=	GPIO_OSPEEDR_MEDIUM;
+	GPIO_enL.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_enL);
+	gpio_WritePin(&GPIO_enL, RESET); // ON = RESET, motor izquierdo
 
-	inL.pGPIOx									=	GPIOC;
-	inL.pinConfig.GPIO_PinNumber				=	PIN_12;
-	inL.pinConfig.GPIO_PinMode					=	GPIO_MODE_OUT;
-	inL.pinConfig.GPIO_PinOutputType			=	GPIO_OTYPER_PUSHPULL;
-	inL.pinConfig.GPIO_PinOutputSpeed			=	GPIO_OSPEEDR_MEDIUM;
-	inL.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
-	gpio_Config(&inL);
-	gpio_WritePin(&inL, RESET); // RESET forward// SET backward
+	GPIO_inL.pGPIOx									=	GPIOC;
+	GPIO_inL.pinConfig.GPIO_PinNumber				=	PIN_12;
+	GPIO_inL.pinConfig.GPIO_PinMode					=	GPIO_MODE_OUT;
+	GPIO_inL.pinConfig.GPIO_PinOutputType			=	GPIO_OTYPER_PUSHPULL;
+	GPIO_inL.pinConfig.GPIO_PinOutputSpeed			=	GPIO_OSPEEDR_MEDIUM;
+	GPIO_inL.pinConfig.GPIO_PinPuPdControl			=	GPIO_PUPDR_NOTHING;
+	gpio_Config(&GPIO_inL);
+	gpio_WritePin(&GPIO_inL, RESET); // RESET forward// SET backward
 
-	pwm_R.ptrTIMx				=	TIM2;
-	pwm_R.config.channel		=	PWM_CHANNEL_2;
-	pwm_R.config.periodo		=	1000; 	// [ms/100] {25,50,100} Hz Default = 25Hz (1kHz)
-	pwm_R.config.prescaler		=	100; 	// 1us
-	pwm_R.config.dutyCycle		=	400;	// [duty/1000] Default 20.0%
-	pwm_R.config.outPolarity	=	PWM_POLARITY_LOW; // LOW forward // HIGH backward
+	PWM_Right.ptrTIMx				=	TIM2;
+	PWM_Right.config.channel		=	PWM_CHANNEL_2;
+	PWM_Right.config.periodo		=	1000; 	// [ms/100] {25,50,100} Hz Default = 25Hz (1kHz)
+	PWM_Right.config.prescaler		=	100; 	// 1us
+	PWM_Right.config.dutyCycle		=	400;	// [duty/1000] Default 20.0%
+	PWM_Right.config.outPolarity	=	PWM_POLARITY_LOW; // LOW forward // HIGH backward
 
-	pwm_Config(&pwm_R);
-	pwm_star_Signal(&pwm_R);
+	pwm_Config(&PWM_Right);
+	pwm_star_Signal(&PWM_Right);
 
-	pwm_L.ptrTIMx				=	TIM5;
-	pwm_L.config.channel		=	PWM_CHANNEL_1;
-	pwm_L.config.periodo		=	1000;	// 500Hz
-	pwm_L.config.prescaler		=	100; 	// 10us
-	pwm_L.config.dutyCycle		=	400;	// 20.0%
-	pwm_L.config.outPolarity	=	PWM_POLARITY_HIGH; // HIGH forward // LOW backward
+	PWM_Left.ptrTIMx				=	TIM5;
+	PWM_Left.config.channel		=	PWM_CHANNEL_1;
+	PWM_Left.config.periodo		=	1000;	// 500Hz
+	PWM_Left.config.prescaler		=	100; 	// 10us
+	PWM_Left.config.dutyCycle		=	400;	// 20.0%
+	PWM_Left.config.outPolarity	=	PWM_POLARITY_HIGH; // HIGH forward // LOW backward
 
-	pwm_Config(&pwm_L);
-	pwm_star_Signal(&pwm_L);
+	pwm_Config(&PWM_Left);
+	pwm_star_Signal(&PWM_Left);
 
 	/* PID Controller */
-	pid_Left.Kp							= 40.0f; //1.9 starts in the conversion factor from N to speed
-	pid_Left.Ki							= 39.0f; //39
-	pid_Left.Kd							= 0.2f; //0.2
-	//	pid_Left.delta_Kp					= 5.0f;
+	PID_Left.Kp							= 40.0f; //1.9 starts in the conversion factor from N to speed
+	PID_Left.Ki							= 39.0f; //39
+	PID_Left.Kd							= 0.2f; //0.2
+	//	PID_Left.delta_Kp					= 5.0f;
 
-	pid_Left.T							= SAMPLING_TIME/1000; // Sampling Time =  10ms
-	pid_Left.tau						= 3.6f; //just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
-	pid_Left.limMin						= MIN_PWM;	// N min value
-	pid_Left.limMax						= MAX_PWM;	// N max value
+	PID_Left.T							= SAMPLING_TIME/1000; // Sampling Time =  10ms
+	PID_Left.tau						= 3.6f; //just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
+	PID_Left.limMin						= MIN_PWM;	// N min value
+	PID_Left.limMax						= MAX_PWM;	// N max value
 
 
-	pid_Right.Kp						= 40.0f; //2.25 starts in the conversion factor from N to speed
-	pid_Right.Ki						= 40.0f; //45
-	pid_Right.Kd						= 0.2f; //0.2
-	//	pid_Right.delta_Kp					= 5.0f; //
+	PID_Right.Kp						= 40.0f; //2.25 starts in the conversion factor from N to speed
+	PID_Right.Ki						= 40.0f; //45
+	PID_Right.Kd						= 0.2f; //0.2
+	//	PID_Right.delta_Kp					= 5.0f; //
 
-	pid_Right.T							= SAMPLING_TIME/1000; // Sampling Time =  10ms
-	pid_Right.tau						= TAU; //just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
-	pid_Right.limMin					= MIN_PWM+50;	// N min value
-	pid_Right.limMax					= MAX_PWM+50;	// N max value
+	PID_Right.T							= SAMPLING_TIME/1000; // Sampling Time =  10ms
+	PID_Right.tau						= TAU; //just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
+	PID_Right.limMin					= MIN_PWM+50;	// N min value
+	PID_Right.limMax					= MAX_PWM+50;	// N max value
 
 	/*
 	 * configure SPI2
@@ -680,7 +671,7 @@ void initSys(void){
 //	spiSCK.pinConfig.GPIO_PinNumber				= PIN_13; //0 //13
 //	spiSCK.pinConfig.GPIO_PinMode				= GPIO_MODE_ALTFN;
 //	spiSCK.pinConfig.GPIO_PinAltFunMode			= AF5; //6 //5
-//	//	spiSCK.pinConfig.GPIO_PinPuPdControl		= GPIO_PUPDR_NOTHING;
+//	//	spiSCK.pinConfig.GPIO_PinPuPdControl	= GPIO_PUPDR_NOTHING;
 //	gpio_Config(&spiSCK);
 //
 //	/* config SPIx */

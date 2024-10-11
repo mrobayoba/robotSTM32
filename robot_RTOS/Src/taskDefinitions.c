@@ -70,51 +70,57 @@ void vTask_menu( void * pvParameters ){
 	float auxK = 0;
 	//	char* option;
 
-	const char* msg_menu = "====================================================\n"
+	const char* msg_menu_basic = "====================================================\n"
 			"    	   |             Menu            |          \n"
 			"====================================================\n"
-			"LED effect 					  				--->  	led\n"
-			"Get gyro ID 				  					--->   	id\n"
-			"Get and print gyro data 	  					--->  	get\n"
-			"Enable get and print encoders values 			--->   	se\n"
-			"Disable get and print encoders values 			--->   	sd\n"
-			"Run spirit		 		  						--->    start\n"
-			"Stop spirit			 		  				---> 	stop\n"
-			"Change kIncrement value		  				---> 	k xx.xxx\n"
-			"Move forward		 		  					---> 	for\n"
-			"Move backward		 		  					---> 	back\n"
-			"Turn to right		 		  					---> 	right\n"
-			"Turn to left		 		  					---> 	left\n"
-			"Setpoint++			 		  					---> 	nup\n"
-			"Setpoint--			 		  					---> 	ndown\n"
-			"Increase left Kp	 		  					---> 	r\n"
-			"Increase right Kp	 		  					---> 	u\n"
-			"Decrease left Kp	 		  					---> 	f\n"
-			"Decrease right Kp	 		  					---> 	j\n"
-			"Increase left Ki	 		  					---> 	t\n"
-			"Increase right Ki	 		  					---> 	i\n"
-			"Decrease left Ki	 		  					---> 	g\n"
-			"Decrease right Ki	 		  					---> 	k\n"
-			"Increase left Kd	 		  					---> 	y\n"
-			"Increase right Kd	 		  					---> 	o\n"
-			"Decrease left Kd	 		  					---> 	h\n"
-			"Decrease right Kd	 		  					---> 	l\n"
-			"Increase tau		 		  					---> 	w\n"
-			"Decrease tau		 		  					---> 	s\n"
-			"Receive Map									--->	m xxx\n"
-			"Enter grid size								--->	g xx.xxx\n"
-			"Change motion delay							--->	delay xxxxx\n"
-			"Show PID constants	 		  					--->	keys\n"
-			"Start motion		 		  					--->	drive\n"
-			"Square test		 		  					--->	square\n"
-			"Change square shape 		  					--->	s xx xx\n"
-			"Set correction factor up N_Left  				--->	q xx.xxx\n"
-			"Set correction factor down N_Left  			--->	a xx.xxx\n"
-			"Free heap/clear map 		  					--->	free\n"
-			"Toggle print encoders PID output	  			--->	print\n"
-			"Toggle print drive angle and dir PID output  	--->	pdrive\n"
-			"Exit						  					--->	exit\n"
+			"LED effect 					  				--->led\n"
+			"Run spirit		 		  						--->start\n"
+			"Stop spirit			 		  				--->stop\n"
+			"Move forward		 		  					--->for\n"
+			"Move backward		 		  					--->back\n"
+			"Turn to right		 		  					--->right\n"
+			"Turn to left		 		  					--->left\n"
+			"Receive Map									--->m xxx\n"
+			"Enter grid size								--->g xx.xxx\n"
+			"Change motion delay							--->delay xxxxx\n"
+			"Start motion		 		  					--->drive\n"
+			"Square test		 		  					--->square\n"
+			"Change square shape (max 16x16)				--->s xx xx\n"
+			"Free heap/clear map 		  					--->free\n"
+			"Advanced options			  					--->more\n"
+			"Exit						  					--->exit\n"
 			"Enter your choice here: ";
+	const char* msg_menu_advanced = "====================================================\n"
+				"    	   |             Menu            |          \n"
+				"====================================================\n"
+				"Get gyro ID 				  					--->id\n"
+				"Get and print gyro data 	  					--->get\n"
+				"Enable get and print encoders values 			--->se\n"
+				"Disable get and print encoders values 			--->sd\n"
+				"Change kIncrement value		  				--->k xx.xxx\n"
+				"Setpoint++			 		  					--->nup\n"
+				"Setpoint--			 		  					--->ndown\n"
+				"Increase left Kp	 		  					--->r\n"
+				"Increase right Kp	 		  					--->u\n"
+				"Decrease left Kp	 		  					--->f\n"
+				"Decrease right Kp	 		  					--->j\n"
+				"Increase left Ki	 		  					--->t\n"
+				"Increase right Ki	 		  					--->i\n"
+				"Decrease left Ki	 		  					--->g\n"
+				"Decrease right Ki	 		  					--->k\n"
+				"Increase left Kd	 		  					--->y\n"
+				"Increase right Kd	 		  					--->o\n"
+				"Decrease left Kd	 		  					--->h\n"
+				"Decrease right Kd	 		  					--->l\n"
+				"Increase tau		 		  					--->w\n"
+				"Decrease tau		 		  					--->s\n"
+				"Show PID constants	 		  					--->keys\n"
+				"Set correction factor up N_Left  				--->q xx.xxx\n"
+				"Set correction factor down N_Left  			--->a xx.xxx\n"
+				"Toggle print encoders PID output	  			--->print\n"
+				"Toggle print drive angle and dir PID output  	--->pdrive\n"
+				"Exit						  					--->exit\n"
+				"Enter your choice here: ";
 	while(1){
 		// Send to print in the console the menu
 		//		xQueueSend(xQueueHandler_print, &msg_menu, portMAX_DELAY);
@@ -135,20 +141,25 @@ void vTask_menu( void * pvParameters ){
 				else if(strcmp((char*)(cmd->payload), "help") == 0){
 					xQueueSend(xQueueHandler_print, &msg_help, portMAX_DELAY);
 					// Send to print in the console the menu
-					xQueueSend(xQueueHandler_print, &msg_menu, portMAX_DELAY);
+					xQueueSend(xQueueHandler_print, &msg_menu_basic, portMAX_DELAY);
 					next_state = sMainMenu;
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
+				}
+				else if(strcmp((char*)(cmd->payload), "more") == 0){
+					xQueueSend(xQueueHandler_print, &msg_help, portMAX_DELAY);
+					// Send to print in the console the menu
+					xQueueSend(xQueueHandler_print, &msg_menu_advanced, portMAX_DELAY);
 				}
 				else if(strcmp((char*)(cmd->payload), "se") == 0){
 					xQueueSend(xQueueHandler_print, &msg_option_se, portMAX_DELAY);
 					//				next_state = sEnableSampling;
-					timer_SetState((&encoderS)->samplingTimer, TIMER_ON);
+					timer_SetState((&encoderS_Handler)->samplingTimer, TIMER_ON);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
 				}
 				else if(strcmp((char*)(cmd->payload), "sd") == 0){
 					xQueueSend(xQueueHandler_print, &msg_option_sd, portMAX_DELAY);
 					//				next_state = sDisableSampling;
-					timer_SetState((&encoderS)->samplingTimer, TIMER_OFF);
+					timer_SetState((&encoderS_Handler)->samplingTimer, TIMER_OFF);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
 				}
 				else if(strcmp((char*)(cmd->payload), "print") == 0){
@@ -186,7 +197,7 @@ void vTask_menu( void * pvParameters ){
 					kIncrement = auxK;
 					portENTER_CRITICAL();
 					sprintf(bufferData,"The K increment was set to %.3f\n",auxK);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -200,7 +211,7 @@ void vTask_menu( void * pvParameters ){
 					initSum();
 					portENTER_CRITICAL();
 					sprintf(bufferData,"Now Oppy goes forward %d\n",auxVal);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -215,7 +226,7 @@ void vTask_menu( void * pvParameters ){
 
 					portENTER_CRITICAL();
 					sprintf(bufferData,"Now Oppy goes backward %d\n",auxVal);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -228,7 +239,7 @@ void vTask_menu( void * pvParameters ){
 
 					portENTER_CRITICAL();
 					sprintf(bufferData,"Now Oppy rotates 90° to the right %d\n",auxVal);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -242,7 +253,7 @@ void vTask_menu( void * pvParameters ){
 
 					portENTER_CRITICAL();
 					sprintf(bufferData,"Now Oppy rotates 90° to the left %d\n",auxVal);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -256,8 +267,8 @@ void vTask_menu( void * pvParameters ){
 					clear_string(auxChar);
 
 					N_setpoint++;
-					//		PIDController_Init(&pid_Left);
-					//		PIDController_Init(&pid_Right);
+					//		PIDController_Init(&PID_Left);
+					//		PIDController_Init(&PID_Right);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
 				}
 				else if(strncmp((char*)(cmd->payload), "ndown",2) == 0){ // update PWM frequency
@@ -269,22 +280,22 @@ void vTask_menu( void * pvParameters ){
 					clear_string(auxChar);
 
 					N_setpoint--;
-					//		PIDController_Init(&pid_Left);
-					//		PIDController_Init(&pid_Right);
+					//		PIDController_Init(&PID_Left);
+					//		PIDController_Init(&PID_Right);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
 				}
 				else if(strcmp((char*)(cmd->payload), "r") == 0){ // changes direction forward
 					xQueueSend(xQueueHandler_print, &msg_option_r, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					pid_Left.Kp += kIncrement;
-					//				pid_Left.Ki += 1;
-					//		pid_Left.Kd += 1;
-					//		PIDController_Init(&pid_Left);
+					PID_Left.Kp += kIncrement;
+					//				PID_Left.Ki += 1;
+					//		PID_Left.Kd += 1;
+					//		PIDController_Init(&PID_Left);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Kp_L = %.2f\n",pid_Left.Kp);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Kp_L = %.2f\n",PID_Left.Kp);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -293,14 +304,14 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_u, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					pid_Right.Kp += kIncrement;
-					//				pid_Right.Ki += 1;
-					//		pid_Right.Kd += 1;
-					//		PIDController_Init(&pid_Right);
+					PID_Right.Kp += kIncrement;
+					//				PID_Right.Ki += 1;
+					//		PID_Right.Kd += 1;
+					//		PIDController_Init(&PID_Right);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Kp_R = %.2f\n",pid_Right.Kp);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Kp_R = %.2f\n",PID_Right.Kp);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -309,17 +320,17 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_f, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					pid_Left.Kp -= kIncrement;
-					//				pid_Left.Ki -= 1;
-					//		pid_Left.Kd -= 1;
-					//		if(pid_Left.Kp < 0){
-					//			pid_Left.Kp = 0;
+					PID_Left.Kp -= kIncrement;
+					//				PID_Left.Ki -= 1;
+					//		PID_Left.Kd -= 1;
+					//		if(PID_Left.Kp < 0){
+					//			PID_Left.Kp = 0;
 					//		}
-					//		PIDController_Init(&pid_Left);
+					//		PIDController_Init(&PID_Left);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Kp_L = %.2f\n",pid_Left.Kp);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Kp_L = %.2f\n",PID_Left.Kp);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -328,17 +339,17 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_j, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					pid_Right.Kp -= kIncrement;
-					//				pid_Right.Ki -= 1;
-					//		pid_Right.Kd -= 1;
-					//		if(pid_Right.Kp < 0){
-					//			pid_Right.Kp = 0;
+					PID_Right.Kp -= kIncrement;
+					//				PID_Right.Ki -= 1;
+					//		PID_Right.Kd -= 1;
+					//		if(PID_Right.Kp < 0){
+					//			PID_Right.Kp = 0;
 					//		}
-					//		PIDController_Init(&pid_Right);
+					//		PIDController_Init(&PID_Right);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Kp_R = %.2f\n",pid_Right.Kp);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Kp_R = %.2f\n",PID_Right.Kp);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -347,14 +358,14 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_t, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					//		pid_Left.Kp += 0.1;
-					pid_Left.Ki += kIncrement;
-					//		pid_Left.Kd += 1;
-					//		PIDController_Init(&pid_Left);
+					//		PID_Left.Kp += 0.1;
+					PID_Left.Ki += kIncrement;
+					//		PID_Left.Kd += 1;
+					//		PIDController_Init(&PID_Left);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Ki_L = %.2f\n",pid_Left.Ki);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Ki_L = %.2f\n",PID_Left.Ki);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -363,14 +374,14 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_i, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					//		pid_Right.Kp += 0.1;
-					pid_Right.Ki += kIncrement;
-					//		pid_Right.Kd += 1;
-					//		PIDController_Init(&pid_Right);
+					//		PID_Right.Kp += 0.1;
+					PID_Right.Ki += kIncrement;
+					//		PID_Right.Kd += 1;
+					//		PIDController_Init(&PID_Right);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Ki_R = %.2f\n",pid_Right.Ki);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Ki_R = %.2f\n",PID_Right.Ki);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -379,17 +390,17 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_g, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					//		pid_Left.Kp -= 0.1;
-					pid_Left.Ki -= kIncrement;
-					//		pid_Left.Kd -= 1;
-					if(pid_Left.Ki < 0){
-						pid_Left.Ki = 0;
+					//		PID_Left.Kp -= 0.1;
+					PID_Left.Ki -= kIncrement;
+					//		PID_Left.Kd -= 1;
+					if(PID_Left.Ki < 0){
+						PID_Left.Ki = 0;
 					}
-					//		PIDController_Init(&pid_Left);
+					//		PIDController_Init(&PID_Left);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Ki_L = %.2f\n",pid_Left.Ki);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Ki_L = %.2f\n",PID_Left.Ki);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -398,17 +409,17 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_k, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					//		pid_Right.Kp -= 0.1;
-					pid_Right.Ki -= kIncrement;
-					//		pid_Right.Kd -= 1;
-					if(pid_Right.Ki < 0){
-						pid_Right.Ki = 0;
+					//		PID_Right.Kp -= 0.1;
+					PID_Right.Ki -= kIncrement;
+					//		PID_Right.Kd -= 1;
+					if(PID_Right.Ki < 0){
+						PID_Right.Ki = 0;
 					}
-					//		PIDController_Init(&pid_Right);
+					//		PIDController_Init(&PID_Right);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Ki_R = %.2f\n",pid_Right.Ki);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Ki_R = %.2f\n",PID_Right.Ki);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -417,14 +428,14 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_y, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					//		pid_Left.Kp += 0.1;
-					//				pid_Left.Ki += 1;
-					pid_Left.Kd += kIncrement;
-					//		PIDController_Init(&pid_Left);
+					//		PID_Left.Kp += 0.1;
+					//				PID_Left.Ki += 1;
+					PID_Left.Kd += kIncrement;
+					//		PIDController_Init(&PID_Left);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Kd_L = %.2f\n",pid_Left.Kd);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Kd_L = %.2f\n",PID_Left.Kd);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -433,14 +444,14 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_o, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					//		pid_Right.Kp += 0.1;
-					//				pid_Right.Ki += 1;
-					pid_Right.Kd += kIncrement;
-					//		PIDController_Init(&pid_Right);
+					//		PID_Right.Kp += 0.1;
+					//				PID_Right.Ki += 1;
+					PID_Right.Kd += kIncrement;
+					//		PIDController_Init(&PID_Right);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Kd_R = %.2f\n",pid_Right.Kd);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Kd_R = %.2f\n",PID_Right.Kd);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -449,17 +460,17 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_h, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					//		pid_Left.Kp -= 0.1;
-					//				pid_Left.Ki -= 1;
-					pid_Left.Kd -= kIncrement;
-					if(pid_Left.Kd < 0){
-						pid_Left.Kd = 0;
+					//		PID_Left.Kp -= 0.1;
+					//				PID_Left.Ki -= 1;
+					PID_Left.Kd -= kIncrement;
+					if(PID_Left.Kd < 0){
+						PID_Left.Kd = 0;
 					}
-					//		PIDController_Init(&pid_Left);
+					//		PIDController_Init(&PID_Left);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Kd_L = %.2f\n",pid_Left.Kd);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Kd_L = %.2f\n",PID_Left.Kd);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -468,17 +479,17 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_l, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					//		pid_Right.Kp -= 0.1;
-					//				pid_Right.Ki -= 1;
-					pid_Right.Kd -= kIncrement;
-					if(pid_Right.Kd < 0){
-						pid_Right.Kd = 0;
+					//		PID_Right.Kp -= 0.1;
+					//				PID_Right.Ki -= 1;
+					PID_Right.Kd -= kIncrement;
+					if(PID_Right.Kd < 0){
+						PID_Right.Kd = 0;
 					}
-					//		PIDController_Init(&pid_Right);
+					//		PIDController_Init(&PID_Right);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New Kd_R = %.2f\n",pid_Right.Kd);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New Kd_R = %.2f\n",PID_Right.Kd);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -487,14 +498,14 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_w, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					pid_Left.tau += kIncrement;
-					pid_Right.tau += kIncrement;
-					PIDController_Init(&pid_Left);
-					PIDController_Init(&pid_Right);
+					PID_Left.tau += kIncrement;
+					PID_Right.tau += kIncrement;
+					PIDController_Init(&PID_Left);
+					PIDController_Init(&PID_Right);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New tau = %.2f\n",pid_Right.tau);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New tau = %.2f\n",PID_Right.tau);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -504,14 +515,14 @@ void vTask_menu( void * pvParameters ){
 					xQueueSend(xQueueHandler_print, &msg_option_s, portMAX_DELAY);
 					clear_string((char*)(cmd->payload));
 
-					pid_Left.tau -= kIncrement;
-					pid_Right.tau -= kIncrement;
-					PIDController_Init(&pid_Left);
-					PIDController_Init(&pid_Right);
+					PID_Left.tau -= kIncrement;
+					PID_Right.tau -= kIncrement;
+					PIDController_Init(&PID_Left);
+					PIDController_Init(&PID_Right);
 
 					portENTER_CRITICAL();
-					sprintf(bufferData,"New tau = %.2f\n",pid_Right.tau);
-					usart_writeMsg(&h_commSerial,bufferData);
+					sprintf(bufferData,"New tau = %.2f\n",PID_Right.tau);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -522,14 +533,14 @@ void vTask_menu( void * pvParameters ){
 					clear_string((char*)(cmd->payload));
 					portENTER_CRITICAL();
 					sprintf(bufferData,"New Kp_L = %.2f\nNew Ki_L = %.2f\nNew Kd_L = %.2f\n\n",
-							pid_Left.Kp,pid_Left.Ki,pid_Left.Kd);
-					usart_writeMsg(&h_commSerial,bufferData);
+							PID_Left.Kp,PID_Left.Ki,PID_Left.Kd);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					portENTER_CRITICAL();
 					sprintf(bufferData,"New Kp_R = %.2f\nNew Ki_R = %.2f\nNew Kd_R = %.2f\n",
-							pid_Right.Kp,pid_Right.Ki,pid_Right.Kd);
-					usart_writeMsg(&h_commSerial,bufferData);
+							PID_Right.Kp,PID_Right.Ki,PID_Right.Kd);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
 				}
@@ -544,7 +555,7 @@ void vTask_menu( void * pvParameters ){
 
 
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,auxBufferData); //auxBufferData is storing the map!
+					usart_writeMsg(&USART_commSerial,auxBufferData); //auxBufferData is storing the map!
 					portEXIT_CRITICAL();
 
 					xTaskNotify(xTaskHandler_Astar, 0, eNoAction);
@@ -560,7 +571,7 @@ void vTask_menu( void * pvParameters ){
 					gridSize = auxK;
 					portENTER_CRITICAL();
 					sprintf(bufferData,"The grid size was set to %.3f\n",auxK);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -576,7 +587,7 @@ void vTask_menu( void * pvParameters ){
 					motionDelay = pdMS_TO_TICKS(auxVal);
 					portENTER_CRITICAL();
 					sprintf(bufferData,"The motion delay was set to %d\n",auxVal);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -596,12 +607,12 @@ void vTask_menu( void * pvParameters ){
 				}
 				else if(strcmp((char*)(cmd->payload), "free") == 0){
 					xQueueSend(xQueueHandler_print, &msg_option_free, portMAX_DELAY);
-					// Create a function to clear memory allocated areas from Map.Chart
+					// Create a function to clear memory allocated areas from Map_Handler.Chart
 					// Create Chart by pvPortMalloc... remember to free after reach goal
-					freeMatrix(&Map);
+					freeMatrix(&Map_Handler);
 
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"Map.Chart was successfully deallocated");
+					usart_writeMsg(&USART_commSerial,"Map.Chart was successfully deallocated");
 					portEXIT_CRITICAL();
 
 				}
@@ -617,7 +628,7 @@ void vTask_menu( void * pvParameters ){
 					squareShape[1] = auxVal2;
 					portENTER_CRITICAL();
 					sprintf(bufferData,"The new square shape was set to [%d,%d]\n",auxVal,auxVal2);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -630,7 +641,7 @@ void vTask_menu( void * pvParameters ){
 
 					portENTER_CRITICAL();
 					sprintf(bufferData,"New correctionFactor = %.2f\n",correctionFactor);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -644,7 +655,7 @@ void vTask_menu( void * pvParameters ){
 
 					portENTER_CRITICAL();
 					sprintf(bufferData,"New correctionFactor = %.2f\n",correctionFactor);
-					usart_writeMsg(&h_commSerial,bufferData);
+					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
@@ -705,7 +716,7 @@ void vTask_print( void * pvParameters ){
 	while(1){
 		xQueueReceive(xQueueHandler_print, &msg, portMAX_DELAY);
 		portENTER_CRITICAL();
-		usart_writeMsg(&h_commSerial, (char *) msg);
+		usart_writeMsg(&USART_commSerial, (char *) msg);
 		portEXIT_CRITICAL();
 	}
 }
@@ -758,10 +769,10 @@ void vTask_PID_core(void* pvParameters){ // This is a periodic function
 
 		xTaskNotifyWait(0,0,&xNotifyValue,pdMS_TO_TICKS(50));
 
-		if (encoderS.samplingDone_flag && (flag_PID || (xNotifyValue == SET))) { //can be used with oppyStart() or semaphore
-			encoderS.samplingDone_flag = RESET;
+		if (encoderS_Handler.samplingDone_flag && (flag_PID || (xNotifyValue == SET))) { //can be used with oppyStart() or semaphore
+			encoderS_Handler.samplingDone_flag = RESET;
 
-			//			getCount(&encoderS); // To get N_left (counts[0]) and N_right (counts[1])
+			//			getCount(&encoderS_Handler); // To get N_left (counts[0]) and N_right (counts[1])
 			// Now use the PID with N counts as feedback to get a speed or pwm response
 
 			N_left = encoders->counts[0]; N_right = encoders->counts[1]; // This is because counts[x], may change while PID is in execution but N_x not...
@@ -770,8 +781,8 @@ void vTask_PID_core(void* pvParameters){ // This is a periodic function
 			}
 			else{ // only performs PID when setpoint is not matched
 
-				float pidPwm_L = PIDController_Update(&pid_Left, N_setpoint+correctionFactor, (float) N_left);// try lowering setpoint for this well
-				float pidPwm_R = PIDController_Update(&pid_Right, N_setpoint, (float) N_right);
+				float pidPwm_L = PIDController_Update(&PID_Left, N_setpoint+correctionFactor, (float) N_left);// try lowering setpoint for this well
+				float pidPwm_R = PIDController_Update(&PID_Right, N_setpoint, (float) N_right);
 
 				// Modify pwm to correct the trajectory
 				oppySetPWM(e_PWM_LEFT, pidPwm_L); // this wheel is over sized
@@ -780,8 +791,8 @@ void vTask_PID_core(void* pvParameters){ // This is a periodic function
 			if(flag_restart_movement){
 				initSum();
 				flag_restart_movement = RESET;
-				gpio_WritePin(&enR, RESET);
-				gpio_WritePin(&enL, RESET);
+				gpio_WritePin(&GPIO_enR, RESET);
+				gpio_WritePin(&GPIO_enL, RESET);
 
 			}
 			// Sum N_counts to get the traveled distance/angle
@@ -802,8 +813,8 @@ void vTask_PID_core(void* pvParameters){ // This is a periodic function
 				clear_string(bufferData);
 				portENTER_CRITICAL();
 				sprintf(bufferData,"%.2f %.2f %.2f %.2f\n",distance, N_setpoint+correctionFactor,(float)N_left,(float)N_right);
-				//sprintf(bufferData,"%.2f %d %d\n", N_setpoint,encoderS.counts[0],encoderS.counts[1]);
-				usart_writeMsg(&h_commSerial, bufferData);
+				//sprintf(bufferData,"%.2f %d %d\n", N_setpoint,encoderS_Handler.counts[0],encoderS_Handler.counts[1]);
+				usart_writeMsg(&USART_commSerial, bufferData);
 				portEXIT_CRITICAL();
 				clear_string(bufferData);
 			}
@@ -826,7 +837,7 @@ void vTask_Astar(void* pvParameters){
 		if(xTaskNotifyWait(0,0,NULL,pdMS_TO_TICKS(50))){ // Wait for the map to be given
 
 			// Before this, get the map and its size to pass its pointer here
-			// Get Map shape, looks unnecessary
+			// Get Map_Handler shape, looks unnecessary
 			getMapShape(auxBufferData, mapShape);
 			mapSize = mapShape[eROW]*mapShape[eCOL];
 			nodeHandler_t* OpenList[mapSize];
@@ -836,11 +847,11 @@ void vTask_Astar(void* pvParameters){
 			//			uint16_t navi_index = 0;
 			uint16_t closedIndex = 0;
 			// Create Chart by pvPortMalloc... remember to free after reach goal
-			Map.Chart = (nodeHandler_t**)pvPortMalloc(mapShape[eROW] * sizeof(nodeHandler_t*)); // Allocate memory for rows
+			Map_Handler.Chart = (nodeHandler_t**)pvPortMalloc(mapShape[eROW] * sizeof(nodeHandler_t*)); // Allocate memory for rows
 			for (int i = 0; i < mapShape[eROW]; i++) { // Allocate memory for columns
-				Map.Chart[i] = (nodeHandler_t*)pvPortMalloc(mapShape[eCOL] * sizeof(nodeHandler_t));
+				Map_Handler.Chart[i] = (nodeHandler_t*)pvPortMalloc(mapShape[eCOL] * sizeof(nodeHandler_t));
 			}
-			getMap(auxBufferData, &Map, GRID_SIZE);
+			getMap(auxBufferData, &Map_Handler, GRID_SIZE);
 			// Create open and close lists... by pvPortMalloc...
 			//			OpenList = (nodeHandler_t*)pvPortMalloc(sizeof(nodeHandler_t*) * mapSize);
 			//			ClosedList = (nodeHandler_t*)pvPortMalloc(sizeof(nodeHandler_t*) * mapSize);
@@ -849,8 +860,8 @@ void vTask_Astar(void* pvParameters){
 			initializeList((void*)naviList, mapSize);
 
 			//set and add start point to open
-			SetStartPoint(&Map,GRID_SIZE);
-			OpenList[0] = &Map.Chart[Map.startNode[eROW]][Map.startNode[eCOL]];
+			SetStartPoint(&Map_Handler,GRID_SIZE);
+			OpenList[0] = &Map_Handler.Chart[Map_Handler.startNode[eROW]][Map_Handler.startNode[eCOL]];
 			//loop
 			while(!goalFlag){
 				//current= node in open with the lowest F_cost
@@ -870,7 +881,7 @@ void vTask_Astar(void* pvParameters){
 				// if current is goalNode then return path array
 				if(ptrCurrentNode->start_endFlag == eEndNode){
 					// Create task or function who arrays the complete navi path to goal (DONE)
-					getTrajectory(&Map, naviList); // CAUTION: naviList stores path from goalNode to startNode+1, it does not store startNode
+					getTrajectory(&Map_Handler, naviList); // CAUTION: naviList stores path from goalNode to startNode+1, it does not store startNode
 					uintptr_t pointer = 0;
 					//Find last node in navigationList, last valid node is the first grid to go
 					for(uint16_t i = 0; naviList[i] != NULL; i++){
@@ -896,17 +907,17 @@ void vTask_Astar(void* pvParameters){
 				// set F_cost to neighbor set parent of neighbor to current
 				// if neighbor is not in open
 				// add neighbor to open
-				fillNodeNeighbors(&Map, ptrCurrentNode, OpenList);
+				fillNodeNeighbors(&Map_Handler, ptrCurrentNode, OpenList);
 
 			}
 
 			//Notify to driveOppy task (NOTIFIED BY TASK MENU)
 			//			clear_string(bufferData);
 			portENTER_CRITICAL();
-			usart_writeMsg(&h_commSerial,"\n\nMap successfully allocated, use -drive- to start motion\n\n");
+			usart_writeMsg(&USART_commSerial,"\n\nMap successfully allocated, use -drive- to start motion\n\n");
 			portEXIT_CRITICAL();
 			portENTER_CRITICAL();
-			usart_writeMsg(&h_commSerial,"\n\nWARNING: The only way to deallocate Map is using -free- command!\n\n");
+			usart_writeMsg(&USART_commSerial,"\n\nWARNING: The only way to deallocate Map is using -free- command!\n\n");
 			portEXIT_CRITICAL();
 			//clear_string(bufferData);
 
@@ -1015,7 +1026,7 @@ void vTask_squareTest(void* pvParameters){
 
 
 			portENTER_CRITICAL();
-			usart_writeMsg(&h_commSerial,"\n\nSquare successfully loaded, use -drive- to start motion\n");
+			usart_writeMsg(&USART_commSerial,"\n\nSquare successfully loaded, use -drive- to start motion\n");
 			portEXIT_CRITICAL();
 
 			while(1){
@@ -1023,7 +1034,7 @@ void vTask_squareTest(void* pvParameters){
 				if(notifyValue == eFinish){
 					vPortFree(naviSquareList); // For deallocate the memory
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"naviSquareList deallocated\n\n");
+					usart_writeMsg(&USART_commSerial,"naviSquareList deallocated\n\n");
 					portEXIT_CRITICAL();
 					break; // Go back to the main loop
 				}
@@ -1053,7 +1064,7 @@ void vTask_driveOppyTo(void* pvParameters){
 			if(queueStatus == 0){
 				xTaskNotify(xTaskHandler_squareTest,eFinish,eSetValueWithOverwrite);
 				portENTER_CRITICAL();
-				usart_writeMsg(&h_commSerial,"\n\nNowhere to go now, queue empty\n\n");
+				usart_writeMsg(&USART_commSerial,"\n\nNowhere to go now, queue empty\n\n");
 				portEXIT_CRITICAL();
 			}
 			else{
@@ -1063,7 +1074,7 @@ void vTask_driveOppyTo(void* pvParameters){
 				switch(nodeToGo->naviHere.direction){
 				case eN:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDriving to NORTH\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDriving to NORTH\n\n");
 					portEXIT_CRITICAL();
 					if(currentAngle == RAD_0){
 						// If angle remains unchanged perform one step {move straight}
@@ -1123,14 +1134,14 @@ void vTask_driveOppyTo(void* pvParameters){
 						clear_string(bufferData);
 						portENTER_CRITICAL();
 						sprintf(bufferData,"Angle set to %.2f\n",angle*(180/PI));
-						usart_writeMsg(&h_commSerial,bufferData);
+						usart_writeMsg(&USART_commSerial,bufferData);
 						portEXIT_CRITICAL();
 						clear_string(bufferData);
 					}
 					break;
 				case eS:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDriving to SOUTH\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDriving to SOUTH\n\n");
 					portEXIT_CRITICAL();
 					if(currentAngle == RAD_180 || currentAngle == RAD_N180){
 						// If angle remains unchanged perform one step {move straight}
@@ -1196,14 +1207,14 @@ void vTask_driveOppyTo(void* pvParameters){
 						clear_string(bufferData);
 						portENTER_CRITICAL();
 						sprintf(bufferData,"Angle set to %.2f\n",angle*(180/PI));
-						usart_writeMsg(&h_commSerial,bufferData);
+						usart_writeMsg(&USART_commSerial,bufferData);
 						portEXIT_CRITICAL();
 						clear_string(bufferData);
 					}
 					break;
 				case eW:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDriving to WEST\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDriving to WEST\n\n");
 					portEXIT_CRITICAL();
 					if(currentAngle == -RAD_90){
 						// If angle remains unchanged perform one step {move straight}
@@ -1263,14 +1274,14 @@ void vTask_driveOppyTo(void* pvParameters){
 						clear_string(bufferData);
 						portENTER_CRITICAL();
 						sprintf(bufferData,"Angle set to %.2f\n",angle*(180/PI));
-						usart_writeMsg(&h_commSerial,bufferData);
+						usart_writeMsg(&USART_commSerial,bufferData);
 						portEXIT_CRITICAL();
 						clear_string(bufferData);
 					}
 					break;
 				case eE:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDriving to EAST\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDriving to EAST\n\n");
 					portEXIT_CRITICAL();
 					if(currentAngle == RAD_90){
 						// If angle remains unchanged perform one step {move straight}
@@ -1330,14 +1341,14 @@ void vTask_driveOppyTo(void* pvParameters){
 						clear_string(bufferData);
 						portENTER_CRITICAL();
 						sprintf(bufferData,"Angle set to %.2f\n",angle*(180/PI));
-						usart_writeMsg(&h_commSerial,bufferData);
+						usart_writeMsg(&USART_commSerial,bufferData);
 						portEXIT_CRITICAL();
 						clear_string(bufferData);
 					}
 					break;
 				case eNW:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDriving to NORTH-WEST\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDriving to NORTH-WEST\n\n");
 					portEXIT_CRITICAL();
 					if(currentAngle == -RAD_45){
 						// If angle remains unchanged perform one step {move straight}
@@ -1397,14 +1408,14 @@ void vTask_driveOppyTo(void* pvParameters){
 						clear_string(bufferData);
 						portENTER_CRITICAL();
 						sprintf(bufferData,"Angle set to %.2f\n",angle*(180/PI));
-						usart_writeMsg(&h_commSerial,bufferData);
+						usart_writeMsg(&USART_commSerial,bufferData);
 						portEXIT_CRITICAL();
 						clear_string(bufferData);
 					}
 					break;
 				case eNE:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDriving to NORTH-EAST\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDriving to NORTH-EAST\n\n");
 					portEXIT_CRITICAL();
 					if(currentAngle == RAD_45){
 						// If angle remains unchanged perform one step {move straight}
@@ -1463,14 +1474,14 @@ void vTask_driveOppyTo(void* pvParameters){
 						clear_string(bufferData);
 						portENTER_CRITICAL();
 						sprintf(bufferData,"Angle set to %.2f\n",angle*(180/PI));
-						usart_writeMsg(&h_commSerial,bufferData);
+						usart_writeMsg(&USART_commSerial,bufferData);
 						portEXIT_CRITICAL();
 						clear_string(bufferData);
 					}
 					break;
 				case eSW:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDriving to SOUTH-WEST\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDriving to SOUTH-WEST\n\n");
 					portEXIT_CRITICAL();
 					if(currentAngle == -RAD_135){
 						// If angle remains unchanged perform one step {move straight}
@@ -1529,14 +1540,14 @@ void vTask_driveOppyTo(void* pvParameters){
 						clear_string(bufferData);
 						portENTER_CRITICAL();
 						sprintf(bufferData,"Angle set to %.2f\n",angle*(180/PI));
-						usart_writeMsg(&h_commSerial,bufferData);
+						usart_writeMsg(&USART_commSerial,bufferData);
 						portEXIT_CRITICAL();
 						clear_string(bufferData);
 					}
 					break;
 				case eSE:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDriving to SOUTH-EAST\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDriving to SOUTH-EAST\n\n");
 					portEXIT_CRITICAL();
 					if(currentAngle == RAD_135){
 						// If angle remains unchanged perform one step {move straight}
@@ -1595,7 +1606,7 @@ void vTask_driveOppyTo(void* pvParameters){
 						clear_string(bufferData);
 						portENTER_CRITICAL();
 						sprintf(bufferData,"Angle set to %.2f\n",angle*(180/PI));
-						usart_writeMsg(&h_commSerial,bufferData);
+						usart_writeMsg(&USART_commSerial,bufferData);
 						portEXIT_CRITICAL();
 						clear_string(bufferData);
 					}
@@ -1603,7 +1614,7 @@ void vTask_driveOppyTo(void* pvParameters){
 
 				default:
 					portENTER_CRITICAL();
-					usart_writeMsg(&h_commSerial,"\n\nDirection unknown...\n\n");
+					usart_writeMsg(&USART_commSerial,"\n\nDirection unknown...\n\n");
 					portEXIT_CRITICAL();
 					break;
 				}// switch end
@@ -1626,7 +1637,7 @@ void vTask_driveOppyTo(void* pvParameters){
 //
 //			clear_string(bufferData);
 //			sprintf(bufferData,"ID: %d\n\r",(int)L3GyroReadReg(&L3G4200D, GYRO_FIFO_SRC_REG));
-//			usart_writeMsg(&h_commSerial, (char *) bufferData);
+//			usart_writeMsg(&USART_commSerial, (char *) bufferData);
 //			clear_string(bufferData);
 //		}
 //	}

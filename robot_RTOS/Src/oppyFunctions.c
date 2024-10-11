@@ -8,8 +8,8 @@
 
 
 void oppyStart(void){
-//	gpio_WritePin(&enR, RESET);
-//	gpio_WritePin(&enL, RESET);
+//	gpio_WritePin(&GPIO_enR, RESET);
+//	gpio_WritePin(&GPIO_enL, RESET);
 	// Enables movement
 	flag_restart_movement = SET;
 	flag_PID = SET;
@@ -17,10 +17,10 @@ void oppyStart(void){
 }
 void oppyStop(void){
 	/// Disables movement
-	gpio_WritePin(&enR, SET);
-	gpio_WritePin(&enL, SET);
-	PIDController_Init(&pid_Left);
-	PIDController_Init(&pid_Right);
+	gpio_WritePin(&GPIO_enR, SET);
+	gpio_WritePin(&GPIO_enL, SET);
+	PIDController_Init(&PID_Left);
+	PIDController_Init(&PID_Right);
 	flag_PID = RESET;
 }
 
@@ -61,7 +61,7 @@ void oppySetPWM(uint8_t pwm_right_or_left, float pwmVal){
 			pwmRight++;
 		}
 		portENTER_CRITICAL();
-		pwm_updateDutyCycle(&pwm_R, pwmRight); // Set updated pwm
+		pwm_updateDutyCycle(&PWM_Right, pwmRight); // Set updated pwm
 		portEXIT_CRITICAL();
 	}
 
@@ -81,7 +81,7 @@ void oppySetPWM(uint8_t pwm_right_or_left, float pwmVal){
 			pwmLeft++;
 		}
 		portENTER_CRITICAL();
-		pwm_updateDutyCycle(&pwm_L, pwmLeft);
+		pwm_updateDutyCycle(&PWM_Left, pwmLeft);
 		portEXIT_CRITICAL();
 	}
 
@@ -97,19 +97,19 @@ void oppyTurn(uint8_t direction){
 	switch(direction){
 	case e_TURN_RIGHT:
 		oppyStop();
-		gpio_WritePin(&inR, RESET);
-		pwm_updatePolarity(&pwm_R, PWM_POLARITY_HIGH);
-		gpio_WritePin(&inL, RESET);
-		pwm_updatePolarity(&pwm_L, PWM_POLARITY_HIGH);
+		gpio_WritePin(&GPIO_inR, RESET);
+		pwm_updatePolarity(&PWM_Right, PWM_POLARITY_HIGH);
+		gpio_WritePin(&GPIO_inL, RESET);
+		pwm_updatePolarity(&PWM_Left, PWM_POLARITY_HIGH);
 //		oppyStart();
 
 		break;
 	case e_TURN_LEFT:
 		oppyStop();
-		gpio_WritePin(&inR, SET);
-		pwm_updatePolarity(&pwm_R, PWM_POLARITY_LOW);
-		gpio_WritePin(&inL, SET);
-		pwm_updatePolarity(&pwm_L, PWM_POLARITY_LOW);
+		gpio_WritePin(&GPIO_inR, SET);
+		pwm_updatePolarity(&PWM_Right, PWM_POLARITY_LOW);
+		gpio_WritePin(&GPIO_inL, SET);
+		pwm_updatePolarity(&PWM_Left, PWM_POLARITY_LOW);
 //		oppyStart();
 
 		break;
@@ -122,19 +122,19 @@ void oppyAdvanceTo(uint8_t direction){  // second parameter not in use yet!!!
 	switch(direction){
 	case e_ADVANCE_TO_FORWARD:
 		oppyStop();
-		gpio_WritePin(&inR, SET);
-		pwm_updatePolarity(&pwm_R, PWM_POLARITY_LOW);
-		gpio_WritePin(&inL, RESET);
-		pwm_updatePolarity(&pwm_L, PWM_POLARITY_HIGH);
+		gpio_WritePin(&GPIO_inR, SET);
+		pwm_updatePolarity(&PWM_Right, PWM_POLARITY_LOW);
+		gpio_WritePin(&GPIO_inL, RESET);
+		pwm_updatePolarity(&PWM_Left, PWM_POLARITY_HIGH);
 //		oppyStart();
 
 		break;
 	case e_ADVANCE_TO_BACKWARD:
 		oppyStop();
-		gpio_WritePin(&inR, RESET);
-		pwm_updatePolarity(&pwm_R, PWM_POLARITY_HIGH);
-		gpio_WritePin(&inL, SET);
-		pwm_updatePolarity(&pwm_L, PWM_POLARITY_LOW);
+		gpio_WritePin(&GPIO_inR, RESET);
+		pwm_updatePolarity(&PWM_Right, PWM_POLARITY_HIGH);
+		gpio_WritePin(&GPIO_inL, SET);
+		pwm_updatePolarity(&PWM_Left, PWM_POLARITY_LOW);
 //		oppyStart();
 
 		break;

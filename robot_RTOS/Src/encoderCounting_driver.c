@@ -51,7 +51,7 @@ void counterConfig(encoder_handler_t *encoders){
 
 	encoders->samplingTimer->pTIMx								= TIM3;
 	encoders->samplingTimer->TIMx_Config.TIMx_Prescaler			= 10000; // Generates 0.1 ms increments
-	encoders->samplingTimer->TIMx_Config.TIMx_Period			= (uint32_t) (SAMPLING_TIME*10);	// With the prescaler, generates 250ms increments
+	encoders->samplingTimer->TIMx_Config.TIMx_Period			= (uint32_t) (SAMPLING_TIME*10);	// With the prescaler, generates 100ms increments
 	encoders->samplingTimer->TIMx_Config.TIMx_mode				= TIMER_UP_COUNTER;
 	encoders->samplingTimer->TIMx_Config.TIMx_InterruptEnable	= TIMER_INT_ENABLE;
 	timer_Config(encoders->samplingTimer);
@@ -66,12 +66,12 @@ void getCount(encoder_handler_t *encoders){ // Not needed if timer pointer captu
 	// Reset counter variables
 //	counter_L = 0; counter_R = 0;
 	// Procedure to get counts in the defined sampling time
-//	timer_SetState(encoders->samplingTimer, SET);
+//	timer_SetState(encoders->TIM_samplingTimer, SET);
 
 //	while(!samplingDone_flag){ __NOP();}
 
 	// Stop counting...
-//	timer_SetState(encoders->samplingTimer, RESET);
+//	timer_SetState(encoders->TIM_samplingTimer, RESET);
 //	samplingDone_flag =RESET;
 
 	// Store last values, Store the values in the structure

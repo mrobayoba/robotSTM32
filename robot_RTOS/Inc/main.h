@@ -150,25 +150,25 @@ extern TimerHandle_t xTimerHandler_encoderSampling;
 /* extern Handlers */
 
 //extern gyroHandler_t L3G4200D;
-extern encoder_handler_t encoderS; // Private
+extern encoder_handler_t encoderS_Handler; // Private
 
 // For oppy Wheels
 // PWM wheels
-extern GPIO_Handler_t gpio_pwm_R; //
-extern GPIO_Handler_t enR; //PinA5
-extern GPIO_Handler_t inR; //PinA5
+extern GPIO_Handler_t GPIO_pwm_R; //
+extern GPIO_Handler_t GPIO_enR; //PinA5
+extern GPIO_Handler_t GPIO_inR; //PinA5
 
-extern GPIO_Handler_t gpio_pwm_L; //
-extern GPIO_Handler_t enL; //PinA5
-extern GPIO_Handler_t inL; //PinA5
+extern GPIO_Handler_t GPIO_pwm_L; //
+extern GPIO_Handler_t GPIO_enL; //PinA5
+extern GPIO_Handler_t GPIO_inL; //PinA5
 
-extern PWM_Handler_t pwm_R; // RIGHT WHEEL
-extern PWM_Handler_t pwm_L; // LEFT WHEEL
+extern PWM_Handler_t PWM_Right; // RIGHT WHEEL
+extern PWM_Handler_t PWM_Left; // LEFT WHEEL
 
-extern PID_Controller_t pid_Left;
-extern PID_Controller_t pid_Right;
+extern PID_Controller_t PID_Left;
+extern PID_Controller_t PID_Right;
 
-extern mapHandler_t Map;
+extern mapHandler_t Map_Handler;
 
 // For drive the Oppy_1
 extern uint16_t N_right; // Number of steps counted in DELTA_T seconds
@@ -196,7 +196,7 @@ extern uint8_t flag_print;
 //extern SemaphoreHandle_t xBinarySemaphore;
 
 extern state_t next_state;
-extern USART_Handler_t h_commSerial;
+extern USART_Handler_t USART_commSerial;
 extern uint16_t msToBlink;
 extern float kIncrement;
 extern float correctionFactor;

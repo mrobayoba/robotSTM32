@@ -20,10 +20,7 @@
 
 
 /* Definitions */
-#define MIN_STACK_SIZE 100
-#define STACK_SIZE 150 // in words
-#define STACK_SIZE_PRINT 70
-#define STACK_SIZE_COMM 100
+#define MIN_STACK_SIZE 100 // in words
 
 /* Handlers */
 GPIO_Handler_t GPIO_stateLED 		= {0};
@@ -201,8 +198,8 @@ int main(void)
 	initSys(); // To configure all peripherals
 	oppyStop();
 
-	S_Left = (PI*D_LEFT_WHEEL)/N;//mm
-	S_Right = (PI*D_RIGHT_WHEEL)/N;//mm
+	S_Left = (C_LEFT_WHEEL)/N;//mm per Encoder counts
+	S_Right = (C_RIGHT_WHEEL)/N;//mm
 
 	S_Right = (S_Right+S_Left)/2.0f; // Save mean in S_x used in PID task
 
@@ -408,7 +405,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
 	sprintf(bufferData,"Stack Overflow detected in task: %s\n\r",pcTaskName);
 	usart_writeMsg(&USART_commSerial, (char *) bufferData);
 	clear_string(bufferData);
-    taskDISABLE_INTERRUPTS();
+    taskDISABLE_INTERRUPTS(); // Recommended
     for (;;); // Infinite loop to halt the system
 }
 

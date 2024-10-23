@@ -598,10 +598,17 @@ void vTask_menu( void * pvParameters ){
 					xTaskNotify(xTaskHandler_driveOppyTo, eRun, eSetValueWithOverwrite);
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
 				}
-				else if(strcmp((char*)(cmd->payload), "square") == 0){
+				else if(strcmp((char*)(cmd->payload), "square right") == 0){
 					xQueueSend(xQueueHandler_print, &msg_option_square, portMAX_DELAY);
 					//				next_state = sEnableSampling;
-					xTaskNotify(xTaskHandler_squareTest,SET,eSetValueWithOverwrite);
+					xTaskNotify(xTaskHandler_squareTest,eSquareRight,eSetValueWithOverwrite);
+					// Create a task how pass to the navi queue a navilist,
+					// designed to perform the square test and notify to driveOppyTo
+				}
+				else if(strcmp((char*)(cmd->payload), "square left") == 0){
+					xQueueSend(xQueueHandler_print, &msg_option_square, portMAX_DELAY);
+					//				next_state = sEnableSampling;
+					xTaskNotify(xTaskHandler_squareTest,eSquareLeft,eSetValueWithOverwrite);
 					// Create a task how pass to the navi queue a navilist,
 					// designed to perform the square test and notify to driveOppyTo
 				}
@@ -931,10 +938,25 @@ void vTask_squareTest(void* pvParameters){
 	BaseType_t notifyStatus = {0}; //For debug
 	(void) notifyStatus;
 	uint32_t notifyValue = {0}; // Drive using eRun - free Heap by eFinish
+	uint8_t queueOrder_Left[4] = {eN,eW,eS,eE};
+	uint8_t queueOrder_Right[4] = {eN,eE,eS,eW};
+	uint8_t queueOrder[4];
 
 	while(1){
 		notifyStatus = xTaskNotifyWait(0,ULONG_MAX,&notifyValue,pdMS_TO_TICKS(100));
-		if(notifyValue == SET){
+		if(notifyValue == eSquareLeft || notifyValue == eSquareRight){
+			switch(notifyValue){
+			case eSquareLeft:
+				for (int8_t i = 0; i < 4; i++){
+					queueOrder[i] = queueOrder_Left[i];
+				}
+				break;
+			case eSquareRight:
+				for (int8_t i = 0; i < 4; i++){
+					queueOrder[i] = queueOrder_Right[i];
+				}
+				break;
+			}
 			uint16_t size = (2*squareShape[0]-1)+(2*squareShape[1]-3);
 			nodeHandler_t* naviSquareList; // size of the perimeter
 			naviSquareList = (nodeHandler_t*)pvPortMalloc(size * sizeof(nodeHandler_t));
@@ -944,21 +966,21 @@ void vTask_squareTest(void* pvParameters){
 			nodeHandler_t TurnOnGrid = {0};
 			nodeHandler_t StraightGrid = {0};
 
-			uint8_t currentDir = eN;
+			uint8_t currentDir = queueOrder[0]; // Suppose the robot starts pointing to the north
 
 			for (uint16_t i = 0;i < squareShape[0];++i){
 				for(uint16_t j = 0; j < squareShape[1];++j){
 					// statements to turn the oppy
 					if(i == 0){ // when i is 0
 						if(j == (squareShape[1]-1)){ // when j is max
-							currentDir = eW;
+							currentDir = queueOrder[1];
 							TurnOnGrid.naviHere.direction = currentDir;
 							TurnOnGrid.naviHere.gridDistance = gridSize;
 							naviSquareList[naviSquareIndex] = TurnOnGrid;
 							naviSquareIndex++;
 						}
 						else{ // in any other case
-							StraightGrid.naviHere.direction = eN;
+							StraightGrid.naviHere.direction = queueOrder[0];
 							StraightGrid.naviHere.gridDistance = gridSize;
 
 							naviSquareList[naviSquareIndex] = StraightGrid;
@@ -968,14 +990,14 @@ void vTask_squareTest(void* pvParameters){
 					else if(i == (squareShape[0]-1)){ // or when i is max
 
 						if(j == (squareShape[0]-1)){ // when j is max
-							currentDir = eS;
+							currentDir = queueOrder[2];
 							TurnOnGrid.naviHere.direction = currentDir;
 							TurnOnGrid.naviHere.gridDistance = gridSize;
 							naviSquareList[naviSquareIndex] = TurnOnGrid;
 							naviSquareIndex++;
 						}
 						else if (j == 0){ // or when i is 0
-							currentDir = eE;
+							currentDir = queueOrder[3];
 							TurnOnGrid.naviHere.direction = currentDir;
 							TurnOnGrid.naviHere.gridDistance = gridSize;
 							naviSquareList[naviSquareIndex] = TurnOnGrid;
@@ -983,7 +1005,7 @@ void vTask_squareTest(void* pvParameters){
 
 						}
 						else{ // in any other case
-							StraightGrid.naviHere.direction = eS;
+							StraightGrid.naviHere.direction = queueOrder[2];
 							StraightGrid.naviHere.gridDistance = gridSize;
 
 							naviSquareList[naviSquareIndex] = StraightGrid;
@@ -992,14 +1014,14 @@ void vTask_squareTest(void* pvParameters){
 					}
 					else{ // i different of max or 0
 						if(j == 0){
-							StraightGrid.naviHere.direction = eE;
+							StraightGrid.naviHere.direction = queueOrder[3];
 							StraightGrid.naviHere.gridDistance = gridSize;
 
 							naviSquareList[naviSquareIndex] = StraightGrid;
 							naviSquareIndex++;
 						}
 						else if(j == (squareShape[1]-1)){
-							StraightGrid.naviHere.direction = eW;
+							StraightGrid.naviHere.direction = queueOrder[1];
 							StraightGrid.naviHere.gridDistance = gridSize;
 
 							naviSquareList[naviSquareIndex] = StraightGrid;
@@ -1011,8 +1033,6 @@ void vTask_squareTest(void* pvParameters){
 			}
 
 			// After fill the list, fill the motion queue in the right order
-			uint8_t queueOrder[4] = {eN,eW,eS,eE};
-
 			for(uint8_t i = 0; i < 4; i++){
 				uint8_t dirFlag = queueOrder[i];
 				for(uint16_t n = 0; n < naviSquareIndex; n++){

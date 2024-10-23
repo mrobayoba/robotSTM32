@@ -58,9 +58,9 @@
 
 /* Oppy definitions */
 #define GRID_SIZE 0.255f // [m] from 21-401 lab floor
-#define N 120.0f // number of step divisions in the encoder wheel 72 and double it 'cause rising and falling edge exti
-#define D_RIGHT_WHEEL 52.0f // 52mm diameter also nominal diameter!!!
-#define D_LEFT_WHEEL 51.95f // 51.95mm diameter
+#define N 120.0f // number of step divisions in the encoder wheel 60 and double it 'cause rising and falling edge exti
+#define D_RIGHT_WHEEL 51.0f // 52mm diameter also nominal diameter!!!
+#define D_LEFT_WHEEL 50.5f // 51.95mm diameter
 #define L 105.60f // 105.60mm (Distance between wheels)
 
 #define C_RIGHT_WHEEL  PI*D_RIGHT_WHEEL // Circumference of the right wheel
@@ -92,7 +92,9 @@
 enum{
 	eNot_Run = 0,
 	eRun,
-	eFinish
+	eFinish,
+	eSquareRight, // Draw the square to the right
+	eSquareLeft // Draw the square to the left
 };
 
 enum{
@@ -179,7 +181,7 @@ extern uint16_t pwmLeft;
 
 extern float omega; // angular frequency
 extern float S_Right; // distance factor: To calculate distance
-extern float	S_Left;
+extern float S_Left;
 
 extern float speed; // 30mm/s by Default
 extern float N_setpoint; // 12 counts on 100ms

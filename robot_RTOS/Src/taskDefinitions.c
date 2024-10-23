@@ -49,7 +49,8 @@ const char *msg_option_map = "\n---- Selected option - Receive Map ----\n\n";
 const char *msg_option_grid = "\n---- Selected option - Enter grid size ----\n\n";
 const char *msg_option_delay = "\n---- Selected option - Change motion delay ----\n\n";
 const char *msg_option_drive = "\n---- Selected option - Start motion ----\n\n";
-const char *msg_option_square = "\n---- Selected option - Square test ----\n\n";
+const char *msg_option_squareLeft = "\n---- Selected option - Square Left test ----\n\n";
+const char *msg_option_squareRight = "\n---- Selected option - Square Right test ----\n\n";
 const char *msg_option_cup = "\n---- Selected option - Set correction factor up ----\n\n";
 const char *msg_option_cdown = "\n---- Selected option - Set correction factor down ----\n\n";
 const char *msg_option_squareShape = "\n---- Selected option - Change square shape ----\n\n";
@@ -73,22 +74,23 @@ void vTask_menu( void * pvParameters ){
 	const char* msg_menu_basic = "====================================================\n"
 			"    	   |             Menu            |          \n"
 			"====================================================\n"
-			"LED effect								--->	led\n"
-			"Run spirit								--->	start\n"
-			"Stop spirit							--->	stop\n"
-			"Move forward							--->	for\n"
-			"Move backward							--->	back\n"
-			"Turn to right							--->	right\n"
-			"Turn to left							--->	left\n"
-			"Receive Map							--->	m xxx\n"
-			"Enter grid size						--->	g xx.xxx\n"
-			"Change motion delay					--->	delay xxxxx\n"
-			"Start motion							--->	drive\n"
-			"Square test							--->	square\n"
-			"Change square shape (max 16x16)		--->	s xx xx\n"
-			"Free heap/clear map					--->	free\n"
-			"Advanced options						--->	more\n"
-			"Exit									--->	exit\n"
+			"LED effect								--->led\n"
+			"Run spirit								--->start\n"
+			"Stop spirit							--->stop\n"
+			"Move forward							--->for\n"
+			"Move backward							--->back\n"
+			"Turn to right							--->right\n"
+			"Turn to left							--->left\n"
+			"Receive Map							--->m xxx\n"
+			"Enter grid size						--->g xx.xxx\n"
+			"Change motion delay					--->delay xxxxx\n"
+			"Start motion							--->drive\n"
+			"Square left test						--->square left\n"
+			"Square right test						--->square right\n"
+			"Change square shape (max 16x16)		--->s xx xx\n"
+			"Free heap/clear map					--->free\n"
+			"Advanced options						--->more\n"
+			"Exit									--->exit\n"
 			"Enter your choice here: ";
 	const char* msg_menu_advanced = "====================================================\n"
 				"    	   |             Menu            |          \n"
@@ -599,14 +601,14 @@ void vTask_menu( void * pvParameters ){
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
 				}
 				else if(strcmp((char*)(cmd->payload), "square right") == 0){
-					xQueueSend(xQueueHandler_print, &msg_option_square, portMAX_DELAY);
+					xQueueSend(xQueueHandler_print, &msg_option_squareRight, portMAX_DELAY);
 					//				next_state = sEnableSampling;
 					xTaskNotify(xTaskHandler_squareTest,eSquareRight,eSetValueWithOverwrite);
 					// Create a task how pass to the navi queue a navilist,
 					// designed to perform the square test and notify to driveOppyTo
 				}
 				else if(strcmp((char*)(cmd->payload), "square left") == 0){
-					xQueueSend(xQueueHandler_print, &msg_option_square, portMAX_DELAY);
+					xQueueSend(xQueueHandler_print, &msg_option_squareLeft, portMAX_DELAY);
 					//				next_state = sEnableSampling;
 					xTaskNotify(xTaskHandler_squareTest,eSquareLeft,eSetValueWithOverwrite);
 					// Create a task how pass to the navi queue a navilist,
@@ -895,8 +897,6 @@ void vTask_Astar(void* pvParameters){
 						pointer = (uintptr_t) naviList[i];
 						xQueueSendToFront(xQueueHandler_naviList,(void*)&pointer,xBlockTimeMaxExpected);
 					}
-
-
 
 					// Then create a task for distance calculation and driveOppyThoughPath (DONE)
 					// Call that function from PID task, who controls the movement of the robot (DONE)

@@ -834,16 +834,17 @@ void vTask_PID_core(void* pvParameters){ // This is a periodic function
 }
 
 void vTask_Astar(void* pvParameters){
-	uint16_t mapShape[2] = {0};
-	uint16_t mapSize = 0;
-	uint8_t goalFlag = RESET;
-	nodeHandler_t* ptrCurrentNode = NULL;
+
 
 
 	while(1){
 
 
 		if(xTaskNotifyWait(0,0,NULL,pdMS_TO_TICKS(50))){ // Wait for the map to be given
+			uint16_t mapShape[2] = {0};
+			uint16_t mapSize = 0;
+			uint8_t goalFlag = RESET;
+			nodeHandler_t* ptrCurrentNode = NULL;
 
 			// Before this, get the map and its size to pass its pointer here
 			// Get Map_Handler shape, looks unnecessary

@@ -134,7 +134,7 @@ char bufferData[MAX_MESH_SIZE] = {0}; // Max MAX_MESH_SIZE characters
 
 float kIncrement = 0.5;
 
-float correctionFactor = 0.35f;
+float correctionFactor = 0.0f;
 
 BaseType_t xReturned; // To check the task status
 
@@ -150,7 +150,7 @@ uint16_t msToBlink = 250;
 
 const TickType_t xBlockTimeMaxExpected = pdMS_TO_TICKS(500); // ait in block state max 1s
 
-TickType_t motionDelay = pdMS_TO_TICKS(250); // To wait before a step in driveOppyTo
+TickType_t motionDelay = pdMS_TO_TICKS(200); // To wait before a step in driveOppyTo
 
 // For calibration
 uint16_t sampling_time = SAMPLING_TIME;
@@ -381,13 +381,13 @@ void vTimer_Callback_LED(TimerHandle_t xTimer){
 	gpio_TogglePin(&GPIO_stateLED);
 
 	// This code allows to check remaining stack while a task is execute
-	clear_string(bufferData);
-	portENTER_CRITICAL();
-	UBaseType_t highWaterMark = uxTaskGetStackHighWaterMark(xTaskHandler_menu);
-	sprintf(bufferData,"Remaining STACK from : %d\n\r",(uint)highWaterMark);
-	usart_writeMsg(&USART_commSerial, (char *) bufferData);
-	portEXIT_CRITICAL();
-	clear_string(bufferData);
+//	clear_string(bufferData);
+//	portENTER_CRITICAL();
+//	UBaseType_t highWaterMark = uxTaskGetStackHighWaterMark(xTaskHandler_menu);
+//	sprintf(bufferData,"Remaining STACK from : %d\n\r",(uint)highWaterMark);
+//	usart_writeMsg(&USART_commSerial, (char *) bufferData);
+//	portEXIT_CRITICAL();
+//	clear_string(bufferData);
 }
 
 // EXTI CallBacks

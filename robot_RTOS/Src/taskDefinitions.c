@@ -22,6 +22,7 @@ const char *msg_option_1 = "\n---- Selected option - Get ID ----\n\n";
 const char *msg_option_se = "\n---- Selected option - Enable sampling ----\n\n";
 const char *msg_option_sd = "\n---- Selected option - Disable sampling ----\n\n";
 const char *msg_option_start = "\n---- Selected option - Run spirit ----\n\n";
+const char *msg_option_restart = "\n---- Selected option - Restart driving from interrupt ----\n\n";
 const char *msg_option_stop = "\n---- Selected option - Stop spirit ----\n\n";
 const char *msg_option_k_val = "\n---- Selected option - Change kIncrement value ----\n\n";
 const char *msg_option_for = "\n---- Selected option - Move forward ----\n\n";
@@ -76,6 +77,7 @@ void vTask_menu( void * pvParameters ){
 			"====================================================\n"
 			"LED effect								--->led\n"
 			"Run spirit								--->start\n"
+			"Restart motion from interrupt			--->restart\n"
 			"Stop spirit							--->stop\n"
 			"Move forward							--->for\n"
 			"Move backward							--->back\n"
@@ -117,8 +119,8 @@ void vTask_menu( void * pvParameters ){
 				"Increase tau									--->	w\n"
 				"Decrease tau									--->	s\n"
 				"Show PID constants								--->	keys\n"
-				"Set correction factor up N_Left				--->	q xx.xxx\n"
-				"Set correction factor down N_Left				--->	a xx.xxx\n"
+				"Set correction factor up N_Left				--->	q\n"
+				"Set correction factor down N_Left				--->	a\n"
 				"Toggle print encoders PID output				--->	print\n"
 				"Toggle print drive angle and dir PID output	--->	pdrive\n"
 				"Exit											--->	exit\n"
@@ -182,6 +184,13 @@ void vTask_menu( void * pvParameters ){
 					oppyStart();
 					//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
 				}
+				else if(strcmp((char*)(cmd->payload), "restart") == 0){
+							xQueueSend(xQueueHandler_print, &msg_option_restart, portMAX_DELAY);
+							//				next_state = sDisableSampling;
+							oppyStart();
+							oppyStop();
+							//					xTaskNotify(xTaskHandler_menu, 0, eNoAction);
+						}
 				else if(strcmp((char*)(cmd->payload), "stop") == 0){
 					xQueueSend(xQueueHandler_print, &msg_option_stop, portMAX_DELAY);
 					//				next_state = sDisableSampling;
@@ -197,8 +206,8 @@ void vTask_menu( void * pvParameters ){
 					clear_string(auxChar);
 
 					kIncrement = auxK;
-					portENTER_CRITICAL();
 					sprintf(bufferData,"The K increment was set to %.3f\n",auxK);
+					portENTER_CRITICAL();
 					usart_writeMsg(&USART_commSerial,bufferData);
 					portEXIT_CRITICAL();
 					clear_string(bufferData);
@@ -800,6 +809,7 @@ void vTask_PID_core(void* pvParameters){ // This is a periodic function
 			if(flag_restart_movement){
 				initSum();
 				flag_restart_movement = RESET;
+				flag_detection = SET;
 				gpio_WritePin(&GPIO_enR, RESET);
 				gpio_WritePin(&GPIO_enL, RESET);
 
@@ -813,6 +823,7 @@ void vTask_PID_core(void* pvParameters){ // This is a periodic function
 				oppyStop();
 				distance = RESET;
 				xNotifyValue = RESET;
+				flag_detection = RESET;
 				xTaskNotify(xTaskHandler_PID_core,RESET,eSetValueWithOverwrite);
 				xTaskNotify(xTaskHandler_driveOppyTo,SET,eSetValueWithOverwrite); // Notify to driveOppy task
 			}

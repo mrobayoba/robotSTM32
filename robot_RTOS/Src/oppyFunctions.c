@@ -8,8 +8,8 @@
 
 
 void oppyStart(void){
-//	gpio_WritePin(&GPIO_enR, RESET);
-//	gpio_WritePin(&GPIO_enL, RESET);
+	gpio_WritePin(&GPIO_enR, RESET);
+	gpio_WritePin(&GPIO_enL, RESET);
 	// Enables movement
 	flag_restart_movement = SET;
 	flag_PID = SET;

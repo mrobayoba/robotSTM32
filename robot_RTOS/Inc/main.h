@@ -193,6 +193,7 @@ extern uint8_t flag_refreshPwm;
 extern uint8_t flag_restart_movement;
 extern uint8_t flag_PID;
 extern uint8_t flag_print;
+extern uint8_t flag_detection;
 
 //extern SemaphoreHandle_t xBinarySemaphore;
 

@@ -599,7 +599,7 @@ static void exti_select_edge(EXTI_Config_t *extiConfig){
 		/* Falling Trigger selection register */
         EXTI->FTSR |= (0x1UL << extiConfig->pGPIOHandler->pinConfig.GPIO_PinNumber);
 	}
-	else if(extiConfig->edgeType == EXTI_FALLING_EDGE){
+	else if(extiConfig->edgeType == EXTI_RISING_EDGE){
 		/* Rising Trigger selection register */
 		EXTI->RTSR |= (0x1UL << extiConfig->pGPIOHandler->pinConfig.GPIO_PinNumber);
 	}

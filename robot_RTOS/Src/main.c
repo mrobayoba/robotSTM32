@@ -82,6 +82,7 @@ uint8_t flag_newSpeed 			= RESET;
 uint8_t flag_refreshPwm 		= RESET;
 uint8_t flag_restart_movement 	= RESET;
 uint8_t flag_PID 				= RESET;
+uint8_t flag_detection			= RESET;
 
 // for SPI
 //SPI_Handler_t spiTester	= {0};
@@ -147,7 +148,7 @@ uint16_t msToBlink = 250;
  */
 //int16_t gyroBuffer[GYRO_WATERMARK_VALUE*3] = {0};
 
-const TickType_t xBlockTimeMaxExpected = pdMS_TO_TICKS(1000); // ait in block state max 1s
+const TickType_t xBlockTimeMaxExpected = pdMS_TO_TICKS(500); // ait in block state max 1s
 
 TickType_t motionDelay = pdMS_TO_TICKS(250); // To wait before a step in driveOppyTo
 
@@ -208,7 +209,7 @@ int main(void)
 	xReturned = xTaskCreate(
 	                    vTask_menu,       				/* Function that implements the task. */
 	                    "Menu Task",          			/* Text name for the task. */
-	                    MIN_STACK_SIZE*3,      			/* Stack size in words, not bytes. Remains 13 words */
+	                    MIN_STACK_SIZE*4,      			/* Stack size in words, not bytes. Remains 13 words */
 	                    NULL,    						/* Parameter passed into the task. */
 	                    e_PRIORITY_FREERTOS_MIN_PLUS_2,	/* Priority at which the task is created. */
 	                    &xTaskHandler_menu );      		/* Used to pass out the created task's handle. */
@@ -380,23 +381,31 @@ void vTimer_Callback_LED(TimerHandle_t xTimer){
 	gpio_TogglePin(&GPIO_stateLED);
 
 	// This code allows to check remaining stack while a task is execute
-//	clear_string(bufferData);
-//	portENTER_CRITICAL();
-//	UBaseType_t highWaterMark = uxTaskGetStackHighWaterMark(xTaskHandler_squareTest);
-//	sprintf(bufferData,"Remaining STACK from : %d\n\r",(uint)highWaterMark);
-//	usart_writeMsg(&USART_commSerial, (char *) bufferData);
-//	portEXIT_CRITICAL();
-//	clear_string(bufferData);
+	clear_string(bufferData);
+	portENTER_CRITICAL();
+	UBaseType_t highWaterMark = uxTaskGetStackHighWaterMark(xTaskHandler_menu);
+	sprintf(bufferData,"Remaining STACK from : %d\n\r",(uint)highWaterMark);
+	usart_writeMsg(&USART_commSerial, (char *) bufferData);
+	portEXIT_CRITICAL();
+	clear_string(bufferData);
 }
 
 // EXTI CallBacks
-void callback_ExtInt7(void){ // Proximity Sensor Callback
-//	BaseType_t xHigherPriorityTaskWoken;
+//void callback_ExtInt7(void){ // Proximity Sensor Callback
+////	BaseType_t xHigherPriorityTaskWoken;
+////
+////	xHigherPriorityTaskWoken = pdFALSE; // Comment this!!!
+////
+////	xTaskNotifyFromISR(xTaskHandler_blinkyMode,0,eNoAction,&xHigherPriorityTaskWoken);
 //
-//	xHigherPriorityTaskWoken = pdFALSE; // Comment this!!!
-//
-//	xTaskNotifyFromISR(xTaskHandler_blinkyMode,0,eNoAction,&xHigherPriorityTaskWoken);
-}
+//	if (flag_detection) {
+//		oppyStop();
+//		clear_string(bufferData);
+//		sprintf(bufferData,"Obstacle detected, please clean the road!\nUse -restart- command to restart the motion.\n");
+//		usart_writeMsg(&USART_commSerial, (char *) bufferData);
+//		clear_string(bufferData);
+//	}
+//}
 
 // STACK OVERFLOW CALLBACK
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
@@ -427,27 +436,27 @@ void initSys(void){
 
 
 	// Config UART communication
-	GPIO_pinTX.pGPIOx							= GPIOA;
-	GPIO_pinTX.pinConfig.GPIO_PinNumber			= PIN_2;
-//	GPIO_pinTX.pGPIOx							= GPIOA; // USART1
-//	GPIO_pinTX.pinConfig.GPIO_PinNumber			= PIN_9; // USART1
+//	GPIO_pinTX.pGPIOx							= GPIOA;
+//	GPIO_pinTX.pinConfig.GPIO_PinNumber			= PIN_2;
+	GPIO_pinTX.pGPIOx							= GPIOA; // USART1
+	GPIO_pinTX.pinConfig.GPIO_PinNumber			= PIN_9; // USART1
 	GPIO_pinTX.pinConfig.GPIO_PinMode			= GPIO_MODE_ALTFN;
 	GPIO_pinTX.pinConfig.GPIO_PinOutputSpeed	= GPIO_OSPEED_HIGH;
 	GPIO_pinTX.pinConfig.GPIO_PinAltFunMode		= AF7;
 	gpio_Config(&GPIO_pinTX);
 
-	GPIO_pinRX.pGPIOx							= GPIOA;
-	GPIO_pinRX.pinConfig.GPIO_PinNumber			= PIN_3;
-//	GPIO_pinRX.pGPIOx							= GPIOA; // USART1
-//	GPIO_pinRX.pinConfig.GPIO_PinNumber			= PIN_10; // USART1
+//	GPIO_pinRX.pGPIOx							= GPIOA;
+//	GPIO_pinRX.pinConfig.GPIO_PinNumber			= PIN_3;
+	GPIO_pinRX.pGPIOx							= GPIOA; // USART1
+	GPIO_pinRX.pinConfig.GPIO_PinNumber			= PIN_10; // USART1
 	GPIO_pinRX.pinConfig.GPIO_PinMode			= GPIO_MODE_ALTFN;
 	GPIO_pinRX.pinConfig.GPIO_PinAltFunMode		= AF7;
 	gpio_Config(&GPIO_pinRX);
 
-	USART_commSerial.ptrUSARTx							= USART2;
-	USART_commSerial.USART_Config.baudrate				= USART_BAUDRATE_115200;
-//	USART_commSerial.ptrUSARTx							= USART1;
-//	USART_commSerial.USART_Config.baudrate				= USART_BAUDRATE_19200; // For 50MHz APB1 clock USART1
+//	USART_commSerial.ptrUSARTx							= USART2;
+//	USART_commSerial.USART_Config.baudrate				= USART_BAUDRATE_115200;
+	USART_commSerial.ptrUSARTx							= USART1;
+	USART_commSerial.USART_Config.baudrate				= USART_BAUDRATE_19200; // For 50MHz APB1 clock USART1
 	USART_commSerial.USART_Config.datasize				= USART_DATASIZE_8BIT;
 	USART_commSerial.USART_Config.mode					= USART_MODE_RXTX;
 	USART_commSerial.USART_Config.parity				= USART_PARITY_NONE;
@@ -458,16 +467,16 @@ void initSys(void){
 	usart_config_newInterrupt(&USART_commSerial, e_PRIORITY_FREERTOS_MIN_PLUS_6);
 
 	// Config EXTIs
-	GPIO_proximityInt.pGPIOx							= GPIOC;
-	GPIO_proximityInt.pinConfig.GPIO_PinNumber			= PIN_7;
-	GPIO_proximityInt.pinConfig.GPIO_PinMode			= GPIO_MODE_IN;
-	GPIO_proximityInt.pinConfig.GPIO_PinPuPdControl		= GPIO_PUPDR_NOTHING;
-	gpio_Config(&GPIO_proximityInt);
-
-	EXTI_proximityInt.edgeType							= EXTI_FALLING_EDGE;
-	EXTI_proximityInt.interruptPriority					= e_PRIORITY_NORMAL_MIN_PLUS_10;
-	EXTI_proximityInt.pGPIOHandler						= &GPIO_proximityInt;
-	exti_Config(&EXTI_proximityInt);
+//	GPIO_proximityInt.pGPIOx							= GPIOC;
+//	GPIO_proximityInt.pinConfig.GPIO_PinNumber			= PIN_7;
+//	GPIO_proximityInt.pinConfig.GPIO_PinMode			= GPIO_MODE_IN;
+//	GPIO_proximityInt.pinConfig.GPIO_PinPuPdControl		= GPIO_PUPDR_NOTHING;
+//	gpio_Config(&GPIO_proximityInt);
+//
+//	EXTI_proximityInt.edgeType							= EXTI_RISING_EDGE;
+//	EXTI_proximityInt.interruptPriority					= e_PRIORITY_NORMAL_MIN_PLUS_11; //4
+//	EXTI_proximityInt.pGPIOHandler						= &GPIO_proximityInt;
+//	exti_Config(&EXTI_proximityInt);
 
 //	exti_config_newInterrupt(&EXTI_proximityInt, e_PRIORITY_NORMAL_MIN_PLUS_4); DON'T USE IT
 

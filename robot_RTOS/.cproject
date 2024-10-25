@@ -56,10 +56,10 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/ThirdParty/SEGGER/OS&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/ThirdParty/SEGGER/SEGGER&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;/home/${USER}/GitHub/oppy_1_pj/PeripheralsDrivers/Inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;/home/${USER}/GitHub/oppy_1_pj/CMSIS_DSP/Inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;/home/${USER}/STM32CubeIDE/CMSIS-repo/STM32Cube_FW_F4_V1.27.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;/home/${USER}/STM32CubeIDE/CMSIS-repo/STM32Cube_FW_F4_V1.27.0/Drivers/CMSIS/Core/Include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;/home/${USER}/GitHub/robotSTM32/PeripheralsDrivers/Inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;/home/${USER}/GitHub/robotSTM32/CMSIS_DSP/Inc&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1814900005" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -70,8 +70,8 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.1322721058" name="MCU GCC Linker" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker">
 								<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.script.1293653995" name="Linker Script (-T)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.script" value="${workspace_loc:/${ProjName}/STM32F411RETX_FLASH.ld}" valueType="string"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.directories.1713972777" name="Library search path (-L)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.directories" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;/home/${USER}/GitHub/oppy_1_pj/PeripheralsDrivers/Debug&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;/home/${USER}/GitHub/oppy_1_pj/CMSIS_DSP/Debug&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;/home/${USER}/GitHub/robotSTM32/PeripheralsDrivers/Debug&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;/home/${USER}/GitHub/robotSTM32/CMSIS_DSP/Debug&quot;"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.libraries.204459977" name="Libraries (-l)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.libraries" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="PeripheralsDrivers"/>

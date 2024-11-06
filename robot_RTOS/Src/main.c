@@ -132,9 +132,9 @@ uint32_t SystemCoreClock = 100000000; // 100MHz
 uint8_t commData = {0};
 char bufferData[MAX_MESH_SIZE] = {0}; // Max MAX_MESH_SIZE characters
 
-float kIncrement = 0.5;
+float kIncrement = 0.01 ;
 
-float correctionFactor = 0.0f;
+float correctionFactor = 0.01f;
 
 BaseType_t xReturned; // To check the task status
 
@@ -150,11 +150,11 @@ uint16_t msToBlink = 250;
 
 const TickType_t xBlockTimeMaxExpected = pdMS_TO_TICKS(500); // ait in block state max 1s
 
-TickType_t motionDelay = pdMS_TO_TICKS(200); // To wait before a step in driveOppyTo
+TickType_t motionDelay = pdMS_TO_TICKS(180); // To wait before a step in driveOppyTo
 
 // For calibration
 uint16_t sampling_time = SAMPLING_TIME;
-uint16_t squareShape[2] = {3,3}; // Standard size 1.77m
+uint16_t squareShape[2] = {5,5}; // Standard size 1.77m
 
 uint8_t flag_print = RESET; // Choose to print encoders counting and set point
 
@@ -579,7 +579,7 @@ void initSys(void){
 	//	PID_Left.delta_Kp					= 5.0f;
 
 	PID_Left.T							= SAMPLING_TIME/1000; 	// Sampling Time =  10ms
-	PID_Left.tau						= 3.6f; 				//just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
+	PID_Left.tau						= TAU; 				//just to keep it greater than samplingTime but it can go close to zero or bigger than samplingTime
 	PID_Left.limMin						= MIN_PWM;				// N min value
 	PID_Left.limMax						= MAX_PWM;				// N max value
 
